@@ -1,331 +1,322 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WCripto Wallet</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Roboto',sans-serif;background:#0f1226;color:#fff;line-height:1.5}
-.hidden{display:none}
-.container{max-width:420px;margin:20px auto;padding:20px;border-radius:18px;background:rgba(0,0,0,.35);box-shadow:0 20px 40px rgba(0,0,0,.5)}
-h2,h3{text-align:center;margin-bottom:12px}
-input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:14px;border:none;font-size:15px}
-button{cursor:pointer;font-weight:700;transition:.2s}
-button:hover{opacity:.9}
-input,select{background:#2a2f55;color:#fff}
-.balance{font-size:26px;font-weight:700;color:#00ffcc;text-align:center;margin-bottom:6px}
-.info{text-align:center;color:#ccc;margin-bottom:10px}
-.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}
-.actions button{border-radius:50%;padding:18px 0;font-size:12px}
-.asset{background:#242852;padding:12px;border-radius:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.history{max-height:160px;overflow:auto}
-.history div{background:#2b3166;padding:8px;border-radius:10px;margin-bottom:6px;font-size:13px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#00d2a8;padding:14px 22px;border-radius:14px;display:none;font-weight:700;z-index:999}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:998}
-.modal{background:#1b1f3a;padding:20px;border-radius:18px;width:90%;max-width:360px;position:relative}
-.close{position:absolute;top:10px;right:14px;font-weight:700;cursor:pointer}
-.copy-btn{margin-top:6px;background:#00ffcc;color:#000;font-weight:700;border-radius:10px;cursor:pointer;padding:6px;font-size:12px}
-body.dark{background:#0a0c1a;color:#fff}
-@media(max-width:480px){.container{margin:10px;padding:15px}}
-</style>
-</head>
-<body class="dark">
+<!DOCTYPE html>  <html lang="es">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>WCripto Wallet</title>  
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">  
+<style>  
+*{box-sizing:border-box;margin:0;padding:0}  
+body{font-family:'Roboto',sans-serif;background:#0f1226;color:#fff;line-height:1.5}  
+.hidden{display:none}  
+.container{max-width:420px;margin:20px auto;padding:20px;border-radius:18px;background:rgba(0,0,0,.35);box-shadow:0 20px 40px rgba(0,0,0,.5)}  
+h2,h3{text-align:center;margin-bottom:12px}  
+input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:14px;border:none;font-size:15px}  
+button{cursor:pointer;font-weight:700;transition:.2s}  
+button:hover{opacity:.9}  
+input,select{background:#2a2f55;color:#fff}  
+.balance{font-size:26px;font-weight:700;color:#00ffcc;text-align:center;margin-bottom:6px}  
+.info{text-align:center;color:#ccc;margin-bottom:10px}  
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}  
+.actions button{border-radius:50%;padding:18px 0;font-size:12px}  
+.asset{background:#242852;padding:12px;border-radius:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}  
+.history{max-height:160px;overflow:auto}  
+.history div{background:#2b3166;padding:8px;border-radius:10px;margin-bottom:6px;font-size:13px}  
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#00d2a8;padding:14px 22px;border-radius:14px;display:none;font-weight:700;z-index:999}  
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:998}  
+.modal{background:#1b1f3a;padding:20px;border-radius:18px;width:90%;max-width:360px;position:relative}  
+.close{position:absolute;top:10px;right:14px;font-weight:700;cursor:pointer}  
+.copy-btn{margin-top:6px;background:#00ffcc;color:#000;font-weight:700;border-radius:10px;cursor:pointer;padding:6px;font-size:12px}  
+body.dark{background:#0a0c1a;color:#fff}  
+@media(max-width:480px){.container{margin:10px;padding:15px}}  
+</style>  
+</head>  
+<body class="dark">  <div class="toast" id="toast"></div>  <!-- ===== AUTENTICACIÓN CORREGIDA ===== -->  <div class="container" id="auth">  
+  <h2>WCripto Wallet</h2>    <!-- Registro -->    <div id="registerForm">  
+    <input id="fname" placeholder="Nombre" required>  
+    <input id="lname" placeholder="Apellido" required>  
+    <input id="emailReg" placeholder="Email" required>  
+    <input id="passwordReg" type="password" placeholder="Contraseña" required>  
+    <input id="confirmReg" type="password" placeholder="Confirmar Contraseña" required>  
+    <button id="registerBtn">Registrarse</button>  
+    <p style="text-align:center;color:#aaa;font-size:12px;">  
+      Bono de 30 USDT disponible en primera recarga ≥5 USDT  
+    </p>  
+    <p style="text-align:center;color:#ccc;font-size:12px;cursor:pointer" onclick="showLogin()">¿Ya tienes cuenta? Inicia sesión</p>  
+  </div>    <!-- Login -->    <div id="loginForm" class="hidden">  
+    <input id="emailLogin" placeholder="Email" required>  
+    <input id="passwordLogin" type="password" placeholder="Contraseña" required>  
+    <button id="loginBtn">Iniciar sesión</button>  
+    <p style="text-align:center;color:#ccc;font-size:12px;cursor:pointer" onclick="showRegister()">¿No tienes cuenta? Regístrate</p>  
+  </div>  
+</div>  <!-- ===== DASHBOARD ===== -->  <div class="container hidden" id="dash">  
+<h2>Mi Wallet - <span id="userName"></span></h2>  
+<div class="balance" id="balance"></div>  
+<div class="info" id="usd"></div>  <div class="actions">  
+<button onclick="modalReceive()">Recibir</button>  
+<button onclick="modalSend()">Enviar</button>  
+<button onclick="modalBuy()">Comprar</button>  
+<button onclick="modalSell()">Vender</button>  
+<button onclick="modalSwap()">Swap</button>  
+<button onclick="modalInvest()">Invertir</button>  
+</div>  <div class="asset" id="asset"></div>  <h3>Convertir</h3>  
+<select id="cFrom"></select>  
+<input id="cAmt" type="number" placeholder="Monto">  
+<select id="cTo"></select>  
+<button onclick="convert()">Convertir</button>  
+<div class="info" id="cResult"></div>  <h3>Historial</h3>  
+<div class="history" id="history"></div>  <button onclick="logout()" style="background:#aa3333">Cerrar sesión</button>
 
-<div class="toast" id="toast"></div>
-
-<!-- ===== AUTENTICACIÓN ===== -->
-<div class="container" id="auth">
-<h2>WCripto Wallet</h2>
-<input id="fname" placeholder="Nombre" required>
-<input id="lname" placeholder="Apellido" required>
-<input id="email" placeholder="Email" required>
-<input id="password" type="password" placeholder="Contraseña" required>
-<input id="confirm" type="password" placeholder="Confirmar Contraseña" required>
-<button id="registerBtn">Registrarse</button>
-<button id="loginBtn">Iniciar sesión</button>
-<p style="text-align:center;color:#aaa;font-size:12px;">Bono de 30 USDT disponible en primera recarga ≥5 USDT</p>
-</div>
-
-<!-- ===== DASHBOARD ===== -->
-<div class="container hidden" id="dash">
-<h2>Mi Wallet - <span id="userName"></span></h2>
-<div class="balance" id="balance"></div>
-<div class="info" id="usd"></div>
-
-<div class="actions">
-<button onclick="modalReceive()">Recibir</button>
-<button onclick="modalSend()">Enviar</button>
-<button onclick="modalBuy()">Comprar</button>
-<button onclick="modalSell()">Vender</button>
-<button onclick="modalSwap()">Swap</button>
-<button onclick="modalInvest()">Invertir</button>
-</div>
-
-<div class="asset" id="asset"></div>
-
-<h3>Convertir</h3>
-<select id="cFrom"></select>
-<input id="cAmt" type="number" placeholder="Monto">
-<select id="cTo"></select>
-<button onclick="convert()">Convertir</button>
-<div class="info" id="cResult"></div>
-
-<h3>Historial</h3>
-<div class="history" id="history"></div>
-
-<button onclick="logout()" style="background:#aa3333">Cerrar sesión</button>
-</div>
-
-<!-- ===== MODAL ===== -->
-<div class="modal-bg" id="modalBg">
-<div class="modal">
-<div class="close" onclick="closeModal()">✕</div>
-<div id="modalBody"></div>
-</div>
-</div>
-
-<script>
-/* ===== VARIABLES ===== */
+</div>  <!-- ===== MODAL ===== -->  <div class="modal-bg" id="modalBg">  
+<div class="modal">  
+<div class="close" onclick="closeModal()">✕</div>  
+<div id="modalBody"></div>  
+</div>  
+</div>  
+<script>  
+/* ===== MOSTRAR LOGIN/REGISTRO ===== */  
+function showLogin(){  
+  document.getElementById("registerForm").classList.add("hidden");  
+  document.getElementById("loginForm").classList.remove("hidden");  
+}  
+function showRegister(){  
+  document.getElementById("loginForm").classList.add("hidden");  
+  document.getElementById("registerForm").classList.remove("hidden");  
+}  /* ===== VARIABLES ===== */
 const rates = {USDT:1,USDC:1,BTC:0.000035,SOL:0.04};
 const MAX_HISTORY = 100;
 const BONUS_USDT = 30;
 const MIN_RECHARGE_FOR_BONUS = 5;
 
 const networks = {
-  USDT: {
-    BEP20: "0x3670a0bffb8b8a6d42177807f8dfd369a3995b9e",
-    ETH:   "0x3670a0bffb8b8a6d42177807f8dfd369a3995b9e",
-    SOL:   "5xuPYYDv4MDDD8XZNkHKkBWwyKWKRd9jqcLuVNfeuzVR"
-  }
+USDT: {
+BEP20: "0x3670a0bffb8b8a6d42177807f8dfd369a3995b9e",
+ETH:   "0x3670a0bffb8b8a6d42177807f8dfd369a3995b9e",
+SOL:   "5xuPYYDv4MDDD8XZNkHKkBWwyKWKRd9jqcLuVNfeuzVR"
+}
 };
 
 /* ===== TOAST ===== */
 function toast(msg){
-  const x=document.getElementById("toast");
-  x.innerText=msg;
-  x.style.display="block";
-  setTimeout(()=>x.style.display="none",2200);
+const x=document.getElementById("toast");
+x.innerText=msg;
+x.style.display="block";
+setTimeout(()=>x.style.display="none",2200);
 }
 
 /* ===== STORAGE MULTIUSUARIO ===== */
-// Mejorar seguridad usando hash SHA-256
 async function hashPass(str){
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
 function saveUser(u){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  const idx = users.findIndex(x=>x.email===u.email);
-  if(idx>=0) users[idx]=u; else users.push(u);
-  localStorage.setItem("users", JSON.stringify(users));
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+const idx = users.findIndex(x=>x.email===u.email);
+if(idx>=0) users[idx]=u; else users.push(u);
+localStorage.setItem("users", JSON.stringify(users));
 }
 function loadUser(email){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  return users.find(u=>u.email===email);
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+return users.find(u=>u.email===email);
 }
 function sessionActive(){return localStorage.getItem("session")==="1"}
 function currentUserEmail(){return localStorage.getItem("currentUser")}
+
+/* ===== DASHBOARD ===== */
+function start(){
+const email = currentUserEmail();
+const u = loadUser(email);
+if(!email || !u){logout(); return;}
+document.getElementById("auth").classList.add("hidden");
+document.getElementById("dash").classList.remove("hidden");
+document.getElementById("userName").innerText = ${u.fname} ${u.lname};
+render();
+}
+function logout(){
+if(!confirm("¿Seguro que deseas cerrar sesión?")) return;
+localStorage.removeItem("session");
+localStorage.removeItem("currentUser");
+location.reload();
+}
+
+/* ===== RENDER ===== */
+function render(){
+const email = currentUserEmail();
+const u = loadUser(email);
+if(!u) return;
+document.getElementById("balance").innerText = ${u.bal[u.cur].toFixed(4)} ${u.cur};
+document.getElementById("usd").innerText = ≈ $${(u.bal[u.cur]/rates[u.cur]).toFixed(2)};
+document.getElementById("asset").innerText = ${u.cur} — ${u.bal[u.cur].toFixed(4)};
+
+const h = document.getElementById("history");
+let histSlice = u.hist.slice(-MAX_HISTORY).reverse();
+h.innerHTML = histSlice.map(item=><div>${item}</div>).join("");
+
+const cF = document.getElementById("cFrom"), cT = document.getElementById("cTo");
+const prevFrom = cF.value, prevTo = cT.value;
+cF.innerHTML = ""; cT.innerHTML = "";
+Object.keys(rates).forEach(c=>{cF.innerHTML+=<option>${c}</option>; cT.innerHTML+=<option>${c}</option>});
+if(prevFrom) cF.value = prevFrom;
+if(prevTo) cT.value = prevTo;
+}
+
+/* ===== REGISTRO ===== */
+document.getElementById("registerBtn").onclick = async function(){
+const fname = document.getElementById("fname").value.trim();
+const lname = document.getElementById("lname").value.trim();
+const email = document.getElementById("emailReg").value.trim().toLowerCase();
+const pass = document.getElementById("passwordReg").value.trim();
+const confirm = document.getElementById("confirmReg").value.trim();
+
+if(!fname || !lname || !email || !pass || !confirm){toast("Completa todos los campos"); return;}
+if(pass.length<6){toast("Contraseña mínima 6 caracteres"); return;}
+if(pass!==confirm){toast("Contraseñas no coinciden"); return;}
+const emailRegex=/^[^\s@]+@[^\s@]+.[^\s@]+$/;
+if(!emailRegex.test(email)){toast("Email inválido"); return;}
+if(loadUser(email)){toast("Usuario ya existe"); return;}
+
+const hashedPass = await hashPass(pass);
+const user = {fname,lname,email,pass:hashedPass,cur:"USDT",bal:{USDT:0,USDC:0,BTC:0,SOL:0},hist:[],bonusApplied:false};
+saveUser(user);
+localStorage.setItem("session","1");
+localStorage.setItem("currentUser", email);
+start();
+toast("Registro exitoso");
+}
+
+/* ===== LOGIN ===== */
+document.getElementById("loginBtn").onclick = async function(){
+const email = document.getElementById("emailLogin").value.trim().toLowerCase();
+const pass = document.getElementById("passwordLogin").value.trim();
+if(!email || !pass){toast("Completa email y contraseña"); return;}
+const u = loadUser(email);
+const hashedPass = await hashPass(pass);
+if(!u || u.pass!==hashedPass){toast("Datos incorrectos"); return;}
+localStorage.setItem("session","1");
+localStorage.setItem("currentUser", email);
+start();
+toast("Bienvenido de nuevo");
+}
+
+/* ===== CONVERSION ===== /
+function convert(){
+const amt=parseFloat(document.getElementById("cAmt").value);
+const from=document.getElementById("cFrom").value;
+const to=document.getElementById("cTo").value;
+if(isNaN(amt)||amt<=0){toast("Monto inválido"); return;}
+if(from===to){toast("Selecciona monedas diferentes"); return;}
+let r=amtrates[to]/rates[from];
+r=(to==="BTC"||to==="SOL")? r.toFixed(6): r.toFixed(2);
+document.getElementById("cResult").innerText=≈ ${r} ${to};
+}
+
+/* ===== FUNCIONES GENERALES ===== */
+function confirmAction(fn){
+if(confirm("¿Seguro que deseas realizar esta acción?")) fn();
+}
+function copyToClipboard(text){navigator.clipboard.writeText(text); toast("Copiado al portapapeles");}
+
+/* ===== RECIBIR ===== */
+function modalReceive(){
+const u = loadUser(currentUserEmail());
+let html = <h3>Recibir USDT</h3><p>Transfiere usando la red correcta. Si usas otra red podrías perder los fondos.</p><ul>;
+Object.entries(networks.USDT).forEach(([net, addr])=>{
+html+=<li>${net}: <b>${addr}</b> <button class="copy-btn" onclick="copyToClipboard('${addr}')">Copiar</button></li>;
+});
+html+=</ul><input id="txId" placeholder="ID de transacción">   <select id="txNet">${Object.keys(networks.USDT).map(n=><option>${n}</option>).join('')}</select>   <input id="txAmt" type="number" placeholder="Monto recargado" min="0">   <button onclick="applyRechargePrompt()">Aplicar Recarga</button>;
+modal(html);
+}
+function applyRechargePrompt(){
+const amt=parseFloat(document.getElementById("txAmt").value);
+const txId=document.getElementById("txId").value.trim();
+const txNet=document.getElementById("txNet").value;
+if(!txId){toast("ID de transacción requerido"); return;}
+if(isNaN(amt)||amt<=0){toast("Monto inválido"); return;}
+applyRecharge(amt, txNet, txId);
+}
+function applyRecharge(amt, network, txId){
+const u = loadUser(currentUserEmail());
+if(!networks.USDT[network]){toast("Red inválida"); return;}
+if(u.hist.some(h=>h.includes(ID:${txId}))){toast("ID de transacción ya usado"); return;}
+u.bal.USDT += amt;
+if(!u.bonusApplied && amt>=MIN_RECHARGE_FOR_BONUS){
+u.bal.USDT += BONUS_USDT;
+u.bonusApplied = true;
+u.hist.push(Recarga ${amt} USDT + Bono 30 USDT (${network}, ID:${txId}));
+toast("Bono de 30 USDT aplicado!");
+} else {
+u.hist.push(Recarga ${amt} USDT (${network}, ID:${txId}));
+}
+saveUser(u);
+render();
+closeModal();
+}
+
+/* ===== ENVIAR ===== */
+function modalSend(){modal(<h3>Enviar</h3><input id=sAmt type=number placeholder=Monto min="0"><button onclick="confirmAction(send)">Enviar</button>);}
+function send(){
+const u = loadUser(currentUserEmail());
+const amt=parseFloat(document.getElementById("sAmt").value);
+if(isNaN(amt)||amt<=0||amt>u.bal[u.cur]){toast("Saldo insuficiente"); return;}
+u.bal[u.cur]-=amt;
+u.hist.push(Envío -${amt} ${u.cur});
+saveUser(u); closeModal(); render();
+}
+
+/* ===== COMPRA/VENTA ===== */
+function modalBuy(){trade("Compra","+")}
+function modalSell(){trade("Venta","-")}
+function trade(t,s){modal(<h3>${t}</h3><input id=tAmt type=number placeholder="Monto" min="0"><button onclick="confirmAction(()=>doTrade('${s}'))">${t}</button>)}
+function doTrade(s){
+const u = loadUser(currentUserEmail());
+const amt=parseFloat(document.getElementById("tAmt").value);
+if(isNaN(amt)||(s==="-"&&amt>u.bal[u.cur])||amt<=0){toast("Monto inválido"); return;}
+u.bal[u.cur]+=s==="+"?amt:-amt;
+u.hist.push(${s==="+"?"Compra":"Venta"} ${amt} ${u.cur});
+saveUser(u); closeModal(); render();
+}
+
+/* ===== SWAP ===== /
+function modalSwap(){
+modal(<h3>Swap</h3><select id=sf></select><input id=sa type=number placeholder="Monto" min="0"><select id=st></select><button onclick="confirmAction(swap)">Swap</button>);
+const sf=document.getElementById("sf"), st=document.getElementById("st");
+Object.keys(rates).forEach(c=>{sf.innerHTML+=<option>${c}</option>; st.innerHTML+=<option>${c}</option>});
+}
+function swap(){
+const u = loadUser(currentUserEmail());
+const sf=document.getElementById("sf").value;
+const st=document.getElementById("st").value;
+const amt=parseFloat(document.getElementById("sa").value);
+if(sf===st){toast("Selecciona monedas diferentes"); return;}
+if(isNaN(amt)||amt<=0||amt>u.bal[sf]){toast("Saldo insuficiente"); return;}
+let res=amtrates[st]/rates[sf];
+res=(st==="BTC"||st==="SOL")?res.toFixed(6):res.toFixed(4);
+u.bal[sf]-=amt;
+if(!u.bal[st]) u.bal[st]=0;
+u.bal[st]=parseFloat((u.bal[st]+parseFloat(res)).toFixed(6));
+u.hist.push(Swap ${amt} ${sf} → ${res} ${st});
+saveUser(u); closeModal(); render();
+}
+
+/* ===== INVERTIR ===== */
+function modalInvest(){modal(<h3>Invertir</h3><input id=iAmt type=number placeholder="Monto" min="0"><button onclick="confirmAction(invest)">Invertir</button>)}
+function invest(){
+const u = loadUser(currentUserEmail());
+const amt=parseFloat(document.getElementById("iAmt").value);
+if(isNaN(amt)||amt<=0||amt>u.bal[u.cur]){toast("Saldo insuficiente"); return;}
+u.bal[u.cur]-=amt;
+u.hist.push(Inversión ${amt} ${u.cur});
+saveUser(u); closeModal(); render();
+}
 
 /* ===== MODAL ===== */
 const modalBody = document.getElementById("modalBody");
 function modal(html){modalBody.innerHTML=html; document.getElementById("modalBg").style.display="flex"}
 function closeModal(){document.getElementById("modalBg").style.display="none"}
 
-/* ===== DASHBOARD ===== */
-function start(){
-  const email = currentUserEmail();
-  const u = loadUser(email);
-  if(!email || !u){logout(); return;}
-  document.getElementById("auth").classList.add("hidden");
-  document.getElementById("dash").classList.remove("hidden");
-  document.getElementById("userName").innerText = `${u.fname} ${u.lname}`;
-  render();
-}
-function logout(){
-  if(!confirm("¿Seguro que deseas cerrar sesión?")) return;
-  localStorage.removeItem("session");
-  localStorage.removeItem("currentUser");
-  location.reload();
-}
-
-/* ===== RENDER ===== */
-function render(){
-  const email = currentUserEmail();
-  const u = loadUser(email);
-  if(!u) return;
-  document.getElementById("balance").innerText = `${u.bal[u.cur].toFixed(4)} ${u.cur}`;
-  document.getElementById("usd").innerText = `≈ $${(u.bal[u.cur]/rates[u.cur]).toFixed(2)}`;
-  document.getElementById("asset").innerText = `${u.cur} — ${u.bal[u.cur].toFixed(4)}`;
-  
-  const h = document.getElementById("history");
-  let histSlice = u.hist.slice(-MAX_HISTORY).reverse();
-  h.innerHTML = histSlice.map(item=>`<div>${item}</div>`).join("");
-  
-  const cF = document.getElementById("cFrom"), cT = document.getElementById("cTo");
-  const prevFrom = cF.value, prevTo = cT.value;
-  cF.innerHTML = ""; cT.innerHTML = "";
-  Object.keys(rates).forEach(c=>{cF.innerHTML+=`<option>${c}</option>`; cT.innerHTML+=`<option>${c}</option>`});
-  if(prevFrom) cF.value = prevFrom;
-  if(prevTo) cT.value = prevTo;
-}
-
-/* ===== REGISTRO ===== */
-document.getElementById("registerBtn").onclick = async function(){
-  const fname = document.getElementById("fname").value.trim();
-  const lname = document.getElementById("lname").value.trim();
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const pass = document.getElementById("password").value.trim();
-  const confirm = document.getElementById("confirm").value.trim();
-
-  if(!fname || !lname || !email || !pass || !confirm){toast("Completa todos los campos"); return;}
-  if(pass.length<6){toast("Contraseña mínima 6 caracteres"); return;}
-  if(pass!==confirm){toast("Contraseñas no coinciden"); return;}
-  const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if(!emailRegex.test(email)){toast("Email inválido"); return;}
-  if(loadUser(email)){toast("Usuario ya existe"); return;}
-
-  const hashedPass = await hashPass(pass);
-  const user = {fname,lname,email,pass:hashedPass,cur:"USDT",bal:{USDT:0,USDC:0,BTC:0,SOL:0},hist:[],bonusApplied:false};
-  saveUser(user);
-  localStorage.setItem("session","1");
-  localStorage.setItem("currentUser", email);
-  start();
-  toast("Registro exitoso");
-}
-
-/* ===== LOGIN ===== */
-document.getElementById("loginBtn").onclick = async function(){
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const pass = document.getElementById("password").value.trim();
-  if(!email || !pass){toast("Completa email y contraseña"); return;}
-  const u = loadUser(email);
-  const hashedPass = await hashPass(pass);
-  if(!u || u.pass!==hashedPass){toast("Datos incorrectos"); return;}
-  localStorage.setItem("session","1");
-  localStorage.setItem("currentUser", email);
-  start();
-  toast("Bienvenido de nuevo");
-}
-
-/* ===== CONVERSION ===== */
-function convert(){
-  const amt=parseFloat(document.getElementById("cAmt").value);
-  const from=document.getElementById("cFrom").value;
-  const to=document.getElementById("cTo").value;
-  if(isNaN(amt)||amt<=0){toast("Monto inválido"); return;}
-  if(from===to){toast("Selecciona monedas diferentes"); return;}
-  let r=amt*rates[to]/rates[from];
-  r=(to==="BTC"||to==="SOL")? r.toFixed(6): r.toFixed(2);
-  document.getElementById("cResult").innerText=`≈ ${r} ${to}`;
-}
-
-/* ===== FUNCIONES GENERALES ===== */
-function confirmAction(fn){
-  if(confirm("¿Seguro que deseas realizar esta acción?")) fn();
-}
-function copyToClipboard(text){navigator.clipboard.writeText(text); toast("Copiado al portapapeles");}
-
-/* ===== RECIBIR ===== */
-function modalReceive(){
-  const u = loadUser(currentUserEmail());
-  let html = `<h3>Recibir USDT</h3><p>Transfiere usando la red correcta. Si usas otra red podrías perder los fondos.</p><ul>`;
-  Object.entries(networks.USDT).forEach(([net, addr])=>{
-    html+=`<li>${net}: <b>${addr}</b> <button class="copy-btn" onclick="copyToClipboard('${addr}')">Copiar</button></li>`;
-  });
-  html+=`</ul><input id="txId" placeholder="ID de transacción">
-  <select id="txNet">${Object.keys(networks.USDT).map(n=>`<option>${n}</option>`).join('')}</select>
-  <input id="txAmt" type="number" placeholder="Monto recargado" min="0">
-  <button onclick="applyRechargePrompt()">Aplicar Recarga</button>`;
-  modal(html);
-}
-function applyRechargePrompt(){
-  const amt=parseFloat(document.getElementById("txAmt").value);
-  const txId=document.getElementById("txId").value.trim();
-  const txNet=document.getElementById("txNet").value;
-  if(!txId){toast("ID de transacción requerido"); return;}
-  if(isNaN(amt)||amt<=0){toast("Monto inválido"); return;}
-  applyRecharge(amt, txNet, txId);
-}
-function applyRecharge(amt, network, txId){
-  const u = loadUser(currentUserEmail());
-  if(!networks.USDT[network]){toast("Red inválida"); return;}
-  if(u.hist.some(h=>h.includes(`ID:${txId}`))){toast("ID de transacción ya usado"); return;}
-  u.bal.USDT += amt;
-  if(!u.bonusApplied && amt>=MIN_RECHARGE_FOR_BONUS){
-    u.bal.USDT += BONUS_USDT;
-    u.bonusApplied = true;
-    u.hist.push(`Recarga ${amt} USDT + Bono 30 USDT (${network}, ID:${txId})`);
-    toast("Bono de 30 USDT aplicado!");
-  } else {
-    u.hist.push(`Recarga ${amt} USDT (${network}, ID:${txId})`);
-  }
-  saveUser(u);
-  render();
-  closeModal();
-}
-
-/* ===== ENVIAR ===== */
-function modalSend(){modal(`<h3>Enviar</h3><input id=sAmt type=number placeholder=Monto min="0"><button onclick="confirmAction(send)">Enviar</button>`);}
-function send(){
-  const u = loadUser(currentUserEmail());
-  const amt=parseFloat(document.getElementById("sAmt").value);
-  if(isNaN(amt)||amt<=0||amt>u.bal[u.cur]){toast("Saldo insuficiente"); return;}
-  u.bal[u.cur]-=amt;
-  u.hist.push(`Envío -${amt} ${u.cur}`);
-  saveUser(u); closeModal(); render();
-}
-
-/* ===== COMPRA/VENTA ===== */
-function modalBuy(){trade("Compra","+")}
-function modalSell(){trade("Venta","-")}
-function trade(t,s){modal(`<h3>${t}</h3><input id=tAmt type=number placeholder="Monto" min="0"><button onclick="confirmAction(()=>doTrade('${s}'))">${t}</button>`)}
-function doTrade(s){
-  const u = loadUser(currentUserEmail());
-  const amt=parseFloat(document.getElementById("tAmt").value);
-  if(isNaN(amt)||(s==="-"&&amt>u.bal[u.cur])||amt<=0){toast("Monto inválido"); return;}
-  u.bal[u.cur]+=s==="+"?amt:-amt;
-  u.hist.push(`${s==="+"?"Compra":"Venta"} ${amt} ${u.cur}`);
-  saveUser(u); closeModal(); render();
-}
-
-/* ===== SWAP ===== */
-function modalSwap(){
-  modal(`<h3>Swap</h3><select id=sf></select><input id=sa type=number placeholder="Monto" min="0"><select id=st></select><button onclick="confirmAction(swap)">Swap</button>`);
-  const sf=document.getElementById("sf"), st=document.getElementById("st");
-  Object.keys(rates).forEach(c=>{sf.innerHTML+=`<option>${c}</option>`; st.innerHTML+=`<option>${c}</option>`});
-}
-function swap(){
-  const u = loadUser(currentUserEmail());
-  const sf=document.getElementById("sf").value;
-  const st=document.getElementById("st").value;
-  const amt=parseFloat(document.getElementById("sa").value);
-  if(sf===st){toast("Selecciona monedas diferentes"); return;}
-  if(isNaN(amt)||amt<=0||amt>u.bal[sf]){toast("Saldo insuficiente"); return;}
-  let res=amt*rates[st]/rates[sf];
-  res=(st==="BTC"||st==="SOL")?res.toFixed(6):res.toFixed(4);
-  u.bal[sf]-=amt;
-  if(!u.bal[st]) u.bal[st]=0;
-  u.bal[st]=parseFloat((u.bal[st]+parseFloat(res)).toFixed(6));
-  u.hist.push(`Swap ${amt} ${sf} → ${res} ${st}`);
-  saveUser(u); closeModal(); render();
-}
-
-/* ===== INVERTIR ===== */
-function modalInvest(){modal(`<h3>Invertir</h3><input id=iAmt type=number placeholder="Monto" min="0"><button onclick="confirmAction(invest)">Invertir</button>`)}
-function invest(){
-  const u = loadUser(currentUserEmail());
-  const amt=parseFloat(document.getElementById("iAmt").value);
-  if(isNaN(amt)||amt<=0||amt>u.bal[u.cur]){toast("Saldo insuficiente"); return;}
-  u.bal[u.cur]-=amt;
-  u.hist.push(`Inversión ${amt} ${u.cur}`);
-  saveUser(u); closeModal(); render();
-}
-
 /* ===== INICIO AUTOMÁTICO ===== */
 if(sessionActive() && currentUserEmail()) start();
 </script>
-</body>
-  </html>
+
+</body>  
+</html>  
