@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet Crypto Pro</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#1e1e2f; color:white; margin:0; padding:0; }
+  .container { max-width: 500px; margin: 20px auto; background:#2c2c3e; padding:20px; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.5);}
+  h2, h3 { text-align:center; color:#ffb347; }
+  input, select, button { width:100%; padding:12px; margin:6px 0; border-radius:8px; border:none; font-size:1em; }
+  input, select { background:#3a3a4f; color:white; }
+  button { background:#ff5a00; color:white; cursor:pointer; font-weight:bold; }
+  button:hover { background:#e04f00; }
+  .hidden { display:none; }
+  .section { margin-top:25px; border-top:1px solid #444; padding-top:15px; }
+  .balance { font-size:1.3em; font-weight:bold; margin-bottom:12px; color:#00ffcc; text-align:center; }
+  .history { font-size:0.9em; background:#3a3a4f; padding:10px; border-radius:8px; max-height:150px; overflow-y:auto; }
+  .info { font-size:0.9em; color:#ccc; margin:5px 0; }
+  .btn-small { width:48%; display:inline-block; margin:2px 1%; font-size:0.9em; }
+</style>
+</head>
+<body>
+
+<!-- Registro -->
+<div class="container" id="registerSection">
+  <h2>Registro Wallet Crypto</h2>
+  <input type="email" id="regEmail" placeholder="Correo electrónico">
+  <input type="password" id="regPassword" placeholder="Contraseña">
+  <select id="regCurrency">
+    <option value="USDT">USDT</option>
+    <option value="USDC">USDC</option>
+    <option value="BTC">BTC</option>
+    <option value="SOL">SOL</option>
+  </select>
+  <input type="text" id="regCode" placeholder="Código de bono (opcional)">
+  <button id="btnRegister">Registrarse</button>
+  <p>¿Ya tienes cuenta? <button id="btnGoLogin" style="background:#007bff;">Iniciar Sesión</button></p>
+</div>
+
+<!-- Login -->
+<div class="container hidden" id="loginSection">
+  <h2>Login Wallet Crypto</h2>
+  <input type="email" id="loginEmail" placeholder="Correo electrónico">
+  <input type="password" id="loginPassword" placeholder="Contraseña">
+  <button id="btnLogin">Iniciar Sesión</button>
+  <p>¿No tienes cuenta? <button id="btnGoRegister" style="background:#007bff;">Registrarse</button></p>
+</div>
+
+<!-- Dashboard -->
+<div class="container hidden" id="dashboardSection">
+  <h2>Dashboard Wallet</h2>
+  <div class="balance" id="balanceDisplay">Saldo: 0</div>
+  <div class="info" id="totalUSD">Total en USD: 0</div>
+
+  <!-- Agregar Fondos -->
+  <div class="section">
+    <h3>Agregar Fondos</h3>
+    <select id="fundCurrency">
+      <option value="USDT">USDT</option>
+      <option value="USDC">USDC</option>
+      <option value="BTC">BTC</option>
+      <option value="SOL">SOL</option>
+    </select>
+    <p class="info">Dirección de wallet (ejemplo): <span id="walletAddress">0x1234abcd...</span></p>
+    <button id="btnSendFunds">He enviado la cripto</button>
+    <input type="text" id="fundCode" placeholder="Código de validación">
+    <button id="btnValidateFund">Validar código</button>
+  </div>
+
+  <!-- Invertir Fondos -->
+  <div class="section">
+    <h3>Invertir Fondos</h3>
+    <select id="investCurrency">
+      <option value="USDT">USDT</option>
+      <option value="USDC">USDC</option>
+      <option value="BTC">BTC</option>
+      <option value="SOL">SOL</option>
+    </select>
+    <input type="number" id="investAmount" placeholder="Monto a invertir">
+    <button id="btnCalculateProfit">Calcular Ganancia</button>
+    <div id="profitDisplay" class="info"></div>
+    <button id="btnConfirmInvestment">Confirmar Inversión</button>
+  </div>
+
+  <!-- Retirar Fondos -->
+  <div class="section">
+    <h3>Retirar Fondos</h3>
+    <select id="withdrawCurrency">
+      <option value="USDT">USDT</option>
+      <option value="USDC">USDC</option>
+      <option value="BTC">BTC</option>
+      <option value="SOL">SOL</option>
+    </select>
+    <input type="text" id="withdrawAddress" placeholder="Dirección destino">
+    <input type="number" id="withdrawAmount" placeholder="Monto a retirar">
+    <button id="btnWithdraw">Confirmar Retiro</button>
+  </div>
+
+  <!-- Conversión de Cripto -->
+  <div class="section">
+    <h3>Convertir Cripto</h3>
+    <select id="convertFrom">
+      <option value="USDT">USDT</option>
+      <option value="USDC">USDC</option>
+      <option value="BTC">BTC</option>
+      <option value="SOL">SOL</option>
+    </select>
+    <input type="number" id="convertAmount" placeholder="Monto a convertir">
+    <select id="convertTo">
+      <option value="USDT">USDT</option>
+      <option value="USDC">USDC</option>
+      <option value="BTC">BTC</option>
+      <option value="SOL">SOL</option>
+    </select>
+    <button id="btnConvert">Convertir</button>
+    <div id="convertResult" class="info"></div>
+  </div>
+
+  <!-- Historial -->
+  <div class="section">
+    <h3>Historial</h3>
+    <div class="history" id="historyLog"></div>
+  </div>
+
+  <div class="section">
+    <button id="btnLogout">Cerrar Sesión</button>
+  </div>
+</div>
+
+<script>
+// Tasas y código de bono
+const rates = { USDT:1, USDC:1, BTC:0.00035, SOL:0.04 };
+const validBonusCode = "BONO20";
+const bonusAmountUSDT = 20;
+
+// ---- Registro ----
+document.getElementById("btnRegister").onclick = function() {
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
+  const code = document.getElementById("regCode").value;
+  const currency = document.getElementById("regCurrency").value;
+
+  if(localStorage.getItem("user")) { alert("Usuario ya registrado. Solo login."); return; }
+
+  let balance = 0, bonusUsed = false;
+  if(code === validBonusCode) { 
+    balance = bonusAmountUSDT * rates[currency];
+    bonusUsed = true;
+    alert(`Bono aplicado: ${balance} ${currency}`);
+  } else if(code) { alert("Código inválido. No se aplicó bono."); }
+
+  const user = { email, passwordHash:btoa(password), createdAt:new Date().toISOString(), wallet:{currency, balance, bonusUsed}, history:[] };
+  localStorage.setItem("user", JSON.stringify(user));
+  alert("Registro exitoso. Ahora puedes iniciar sesión.");
+  showLogin();
+}
+
+document.getElementById("btnGoLogin").onclick = showLogin;
+document.getElementById("btnGoRegister").onclick = showRegister;
+
+// ---- Login ----
+document.getElementById("btnLogin").onclick = function() {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+  const user = JSON.parse(localStorage.getItem("user"));
+  if(!user) { alert("No existe usuario"); return; }
+  if(user.email === email && user.passwordHash === btoa(password)) {
+    localStorage.setItem("session", JSON.stringify({isLoggedIn:true, lastLogin:new Date().toISOString()}));
+    showDashboard();
+  } else { alert("Credenciales incorrectas"); }
+}
+
+// ---- Dashboard ----
+function showDashboard() {
+  document.getElementById("registerSection").classList.add("hidden");
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("dashboardSection").classList.remove("hidden");
+  updateDashboard();
+}
+
+function showLogin() { document.getElementById("registerSection").classList.add("hidden"); document.getElementById("loginSection").classList.remove("hidden"); }
+function showRegister() { document.getElementById("loginSection").classList.add("hidden"); document.getElementById("registerSection").classList.remove("hidden"); }
+
+function updateDashboard() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  document.getElementById("balanceDisplay").innerText = `Saldo: ${user.wallet.balance.toFixed(4)} ${user.wallet.currency}`;
+  const totalUSD = (user.wallet.balance / rates[user.wallet.currency]).toFixed(2);
+  document.getElementById("totalUSD").innerText = `Total en USD: ${totalUSD}`;
+  updateHistory();
+}
+
+// ---- Logout ----
+document.getElementById("btnLogout").onclick = function() {
+  localStorage.removeItem("session");
+  showLogin();
+}
+
+// ---- Historial ----
+function updateHistory() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const historyDiv = document.getElementById("historyLog");
+  historyDiv.innerHTML = "";
+  user.history.forEach(entry => { historyDiv.innerHTML += `<div>${entry}</div>`; });
+}
+
+// ---- Agregar Fondos ----
+document.getElementById("btnSendFunds").onclick = function() {
+  alert("Simulación: Se enviaron los fondos. Ingresa el código de validación.");
+}
+
+document.getElementById("btnValidateFund").onclick = function() {
+  const code = document.getElementById("fundCode").value;
+  if(code === "1234") { 
+    const user = JSON.parse(localStorage.getItem("user"));
+    user.wallet.balance += 20 * rates[user.wallet.currency];
+    user.history.push(`Bono de depósito validado: +${20 * rates[user.wallet.currency]} ${user.wallet.currency}`);
+    localStorage.setItem("user", JSON.stringify(user));
+    alert("Código validado. Fondos agregados a tu wallet.");
+    updateDashboard();
+  } else { alert("Código incorrecto."); }
+}
+
+// ---- Invertir ----
+document.getElementById("btnCalculateProfit").onclick = function() {
+  const amount = parseFloat(document.getElementById("investAmount").value);
+  const currency = document.getElementById("investCurrency").value;
+  const ratesSimulated = { USDT:0.3, USDC:0.08, BTC:0.12, SOL:0.10 }; 
+  const profit = amount * ratesSimulated[currency];
+  document.getElementById("profitDisplay").innerText = `Ganancia estimada: ${profit.toFixed(4)} ${currency}`;
+}
+
+document.getElementById("btnConfirmInvestment").onclick = function() {
+  const amount = parseFloat(document.getElementById("investAmount").value);
+  const currency = document.getElementById("investCurrency").value;
+  const user = JSON.parse(localStorage.getItem("user"));
+  if(amount > user.wallet.balance) { alert("Saldo insuficiente"); return; }
+  const ratesSimulated = { USDT:0.3, USDC:0.08, BTC:0.12, SOL:0.10 };
+  const profit = amount * ratesSimulated[currency];
+  user.wallet.balance -= amount;
+  user.history.push(`Inversión: -${amount} ${currency}, Ganancia estimada: ${profit.toFixed(4)} ${currency}`);
+  localStorage.setItem("user", JSON.stringify(user));
+  alert("Inversión registrada.");
+  updateDashboard();
+}
+
+// ---- Retirar fondos ----
+document.getElementById("btnWithdraw").onclick = function() {
+  const currency = document.getElementById("withdrawCurrency").value;
+  const address = document.getElementById("withdrawAddress").value;
+  const amount = parseFloat(document.getElementById("withdrawAmount").value);
+  const user = JSON.parse(localStorage.getItem("user"));
+  if(amount > user.wallet.balance) { alert("Saldo insuficiente"); return; }
+  user.wallet.balance -= amount;
+  user.history.push(`Retiro: -${amount} ${currency} a ${address}`);
+  localStorage.setItem("user", JSON.stringify(user));
+  alert(`Retiro simulado: ${amount} ${currency} enviado a ${address}`);
+  updateDashboard();
+}
+
+// ---- Convertir cripto ----
+document.getElementById("btnConvert").onclick = function() {
+  const from = document.getElementById("convertFrom").value;
+  const to = document.getElementById("convertTo").value;
+  const amount = parseFloat(document.getElementById("convertAmount").value);
+  const user = JSON.parse(localStorage.getItem("user"));
+  if(amount > user.wallet.balance || user.wallet.currency !== from) { alert("Saldo insuficiente o cripto incorrecta"); return; }
+  const converted = amount * rates[to] / rates[from];
+  user.wallet.balance -= amount;
+  user.wallet.balance += converted;
+  user.wallet.currency = to;
+  user.history.push(`Conversión: ${amount} ${from} → ${converted.toFixed(4)} ${to}`);
+  localStorage.setItem("user", JSON.stringify(user));
+  document.getElementById("convertResult").innerText = `Convertido: ${converted.toFixed(4)} ${to}`;
+  updateDashboard();
+}
+
+// ---- Auto check si ya hay sesión ----
+window.onload = function() {
+  const session = JSON.parse(localStorage.getItem("session"));
+  if(session && session.isLoggedIn) showDashboard();
+  else if(localStorage.getItem("user")) showLogin();
+  else showRegister();
+}
+</script>
+</body>
+</html>
