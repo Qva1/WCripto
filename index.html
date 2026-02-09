@@ -3,28 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallet Crypto Pro</title>
+<title>Wallet Crypto Tipo Trust Wallet</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  body { font-family: Arial, sans-serif; background:#1e1e2f; color:white; margin:0; padding:0; }
-  .container { max-width: 500px; margin: 20px auto; background:#2c2c3e; padding:20px; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.5);}
-  h2, h3 { text-align:center; color:#ffb347; }
-  input, select, button { width:100%; padding:12px; margin:6px 0; border-radius:8px; border:none; font-size:1em; }
-  input, select { background:#3a3a4f; color:white; }
-  button { background:#ff5a00; color:white; cursor:pointer; font-weight:bold; }
-  button:hover { background:#e04f00; }
-  .hidden { display:none; }
-  .section { margin-top:25px; border-top:1px solid #444; padding-top:15px; }
-  .balance { font-size:1.3em; font-weight:bold; margin-bottom:12px; color:#00ffcc; text-align:center; }
-  .history { font-size:0.9em; background:#3a3a4f; padding:10px; border-radius:8px; max-height:150px; overflow-y:auto; }
-  .info { font-size:0.9em; color:#ccc; margin:5px 0; }
-  .btn-small { width:48%; display:inline-block; margin:2px 1%; font-size:0.9em; }
+body {
+  margin:0; padding:0; font-family: 'Roboto', sans-serif;
+  background: linear-gradient(180deg,#1b1d36,#2d3a5b);
+  color:#fff; overflow-x:hidden;
+}
+.hidden { display:none; }
+.toast {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  background:#00cc88; padding:14px 20px; border-radius:12px;
+  font-weight:700; display:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+.container {
+  max-width:480px; margin:20px auto; padding:20px; border-radius:16px;
+  background:rgba(0,0,0,0.35); box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+h2 { text-align:center; font-weight:700; margin-bottom:20px; }
+h3 { margin:15px 0; font-weight:500; color:#a0d9ff; }
+input, select, button {
+  width:100%; padding:12px; margin:6px 0; border-radius:12px; border:none; font-size:1em;
+}
+input, select { background:#2a2c40; color:#fff; }
+button {
+  background:linear-gradient(90deg,#00cc88,#00ffaa); color:#fff; font-weight:700; cursor:pointer;
+  transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.3);
+}
+button:hover { transform:scale(1.03); }
+.section { margin-top:25px; border-top:1px solid #444; padding-top:15px; }
+.balance { text-align:center; font-size:1.5em; font-weight:700; color:#00ffcc; margin-bottom:10px; }
+.info { font-size:0.9em; color:#ccc; margin:5px 0; }
+.btn-small { width:48%; display:inline-block; margin:2px 1%; font-size:0.9em; border-radius:12px; }
+.history { max-height:180px; overflow-y:auto; }
+.history .entry { background:#2f334b; padding:8px 12px; border-radius:12px; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+.history .entry img { width:20px; height:20px; }
+.asset-list { margin-top:15px; }
+.asset-item { display:flex; align-items:center; justify-content:space-between; background:#2a2c40; padding:12px; border-radius:12px; margin-bottom:8px; }
+.asset-item img { width:32px; height:32px; margin-right:10px; }
+.asset-name { display:flex; align-items:center; font-weight:500; }
+.modal-bg {
+  position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6);
+  display:none; justify-content:center; align-items:center; z-index:1000;
+}
+.modal { background:#1e1f33; padding:20px; border-radius:16px; width:90%; max-width:400px; }
+.modal h3 { margin-top:0; }
+.modal button { margin-top:10px; }
+.modal .close { position:absolute; top:10px; right:14px; cursor:pointer; font-weight:700; color:#fff; }
+.balance-chart { margin-top:15px; }
+.action-buttons { display:flex; justify-content:space-between; margin-top:15px; }
+.action-buttons button { width:30%; border-radius:50%; padding:14px 0; font-size:0.8em; text-align:center; }
+.action-buttons button img { width:24px; height:24px; display:block; margin:0 auto 4px; }
 </style>
 </head>
 <body>
 
+<div class="toast" id="toast"></div>
+
 <!-- Registro -->
 <div class="container" id="registerSection">
-  <h2>Registro Wallet Crypto</h2>
+  <h2>Registro Wallet</h2>
   <input type="email" id="regEmail" placeholder="Correo electrónico">
   <input type="password" id="regPassword" placeholder="Contraseña">
   <select id="regCurrency">
@@ -40,7 +79,7 @@
 
 <!-- Login -->
 <div class="container hidden" id="loginSection">
-  <h2>Login Wallet Crypto</h2>
+  <h2>Login Wallet</h2>
   <input type="email" id="loginEmail" placeholder="Correo electrónico">
   <input type="password" id="loginPassword" placeholder="Contraseña">
   <button id="btnLogin">Iniciar Sesión</button>
@@ -52,236 +91,160 @@
   <h2>Dashboard Wallet</h2>
   <div class="balance" id="balanceDisplay">Saldo: 0</div>
   <div class="info" id="totalUSD">Total en USD: 0</div>
-
-  <!-- Agregar Fondos -->
-  <div class="section">
-    <h3>Agregar Fondos</h3>
-    <select id="fundCurrency">
-      <option value="USDT">USDT</option>
-      <option value="USDC">USDC</option>
-      <option value="BTC">BTC</option>
-      <option value="SOL">SOL</option>
-    </select>
-    <p class="info">Dirección de wallet (ejemplo): <span id="walletAddress">0x1234abcd...</span></p>
-    <button id="btnSendFunds">He enviado la cripto</button>
-    <input type="text" id="fundCode" placeholder="Código de validación">
-    <button id="btnValidateFund">Validar código</button>
+  
+  <!-- Botones estilo Trust Wallet -->
+  <div class="action-buttons">
+    <button id="btnReceive"><img src="https://img.icons8.com/ios-filled/50/00cc88/receive-cash.png"/>Recibir</button>
+    <button id="btnSend"><img src="https://img.icons8.com/ios-filled/50/00cc88/forward-arrow.png"/>Enviar</button>
+    <button id="btnBuy"><img src="https://img.icons8.com/ios-filled/50/00cc88/buy.png"/>Comprar</button>
   </div>
 
-  <!-- Invertir Fondos -->
-  <div class="section">
-    <h3>Invertir Fondos</h3>
-    <select id="investCurrency">
-      <option value="USDT">USDT</option>
-      <option value="USDC">USDC</option>
-      <option value="BTC">BTC</option>
-      <option value="SOL">SOL</option>
-    </select>
-    <input type="number" id="investAmount" placeholder="Monto a invertir">
-    <button id="btnCalculateProfit">Calcular Ganancia</button>
-    <div id="profitDisplay" class="info"></div>
-    <button id="btnConfirmInvestment">Confirmar Inversión</button>
-  </div>
-
-  <!-- Retirar Fondos -->
-  <div class="section">
-    <h3>Retirar Fondos</h3>
-    <select id="withdrawCurrency">
-      <option value="USDT">USDT</option>
-      <option value="USDC">USDC</option>
-      <option value="BTC">BTC</option>
-      <option value="SOL">SOL</option>
-    </select>
-    <input type="text" id="withdrawAddress" placeholder="Dirección destino">
-    <input type="number" id="withdrawAmount" placeholder="Monto a retirar">
-    <button id="btnWithdraw">Confirmar Retiro</button>
-  </div>
-
-  <!-- Conversión de Cripto -->
-  <div class="section">
-    <h3>Convertir Cripto</h3>
-    <select id="convertFrom">
-      <option value="USDT">USDT</option>
-      <option value="USDC">USDC</option>
-      <option value="BTC">BTC</option>
-      <option value="SOL">SOL</option>
-    </select>
-    <input type="number" id="convertAmount" placeholder="Monto a convertir">
-    <select id="convertTo">
-      <option value="USDT">USDT</option>
-      <option value="USDC">USDC</option>
-      <option value="BTC">BTC</option>
-      <option value="SOL">SOL</option>
-    </select>
-    <button id="btnConvert">Convertir</button>
-    <div id="convertResult" class="info"></div>
-  </div>
+  <!-- Lista de activos -->
+  <div class="asset-list" id="assetList"></div>
 
   <!-- Historial -->
   <div class="section">
     <h3>Historial</h3>
     <div class="history" id="historyLog"></div>
   </div>
+</div>
 
-  <div class="section">
-    <button id="btnLogout">Cerrar Sesión</button>
+<!-- Modales -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalContent">
+    <span class="close" id="modalClose">×</span>
+    <div id="modalBody"></div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Tasas y código de bono
+// 🔹 Variables y rates
 const rates = { USDT:1, USDC:1, BTC:0.00035, SOL:0.04 };
+const assetsInfo = {
+  USDT:{logo:'https://cryptologos.cc/logos/tether-usdt-logo.png?v=025'},
+  USDC:{logo:'https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=025'},
+  BTC:{logo:'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=025'},
+  SOL:{logo:'https://cryptologos.cc/logos/solana-sol-logo.png?v=025'}
+};
 const validBonusCode = "BONO20";
 const bonusAmountUSDT = 20;
 
-// ---- Registro ----
-document.getElementById("btnRegister").onclick = function() {
-  const email = document.getElementById("regEmail").value;
-  const password = document.getElementById("regPassword").value;
-  const code = document.getElementById("regCode").value;
-  const currency = document.getElementById("regCurrency").value;
-
-  if(localStorage.getItem("user")) { alert("Usuario ya registrado. Solo login."); return; }
-
-  let balance = 0, bonusUsed = false;
-  if(code === validBonusCode) { 
-    balance = bonusAmountUSDT * rates[currency];
-    bonusUsed = true;
-    alert(`Bono aplicado: ${balance} ${currency}`);
-  } else if(code) { alert("Código inválido. No se aplicó bono."); }
-
-  const user = { email, passwordHash:btoa(password), createdAt:new Date().toISOString(), wallet:{currency, balance, bonusUsed}, history:[] };
-  localStorage.setItem("user", JSON.stringify(user));
-  alert("Registro exitoso. Ahora puedes iniciar sesión.");
-  showLogin();
+// 🔹 Toast
+function showToast(msg){
+  const t=document.getElementById("toast"); t.innerText=msg; t.style.display="block";
+  setTimeout(()=>{t.style.display="none";},2500);
 }
 
-document.getElementById("btnGoLogin").onclick = showLogin;
-document.getElementById("btnGoRegister").onclick = showRegister;
-
-// ---- Login ----
-document.getElementById("btnLogin").onclick = function() {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
-  const user = JSON.parse(localStorage.getItem("user"));
-  if(!user) { alert("No existe usuario"); return; }
-  if(user.email === email && user.passwordHash === btoa(password)) {
-    localStorage.setItem("session", JSON.stringify({isLoggedIn:true, lastLogin:new Date().toISOString()}));
+// 🔹 Registro/Login
+document.getElementById("btnRegister").onclick=function(){
+  const email=document.getElementById("regEmail").value;
+  const password=document.getElementById("regPassword").value;
+  const code=document.getElementById("regCode").value;
+  const currency=document.getElementById("regCurrency").value;
+  if(localStorage.getItem("user")){ showToast("Usuario ya registrado. Solo login."); return;}
+  let balance=0; if(code===validBonusCode){ balance=bonusAmountUSDT*rates[currency]; showToast(`Bono aplicado: ${balance} ${currency}`);}
+  const user={email,passwordHash:btoa(password),wallet:{currency,balance},history:[]};
+  localStorage.setItem("user",JSON.stringify(user));
+  showToast("Registro exitoso. Inicia sesión."); showLogin();
+}
+document.getElementById("btnGoLogin").onclick=showLogin;
+document.getElementById("btnGoRegister").onclick=showRegister;
+document.getElementById("btnLogin").onclick=function(){
+  const email=document.getElementById("loginEmail").value;
+  const password=document.getElementById("loginPassword").value;
+  const user=JSON.parse(localStorage.getItem("user"));
+  if(user && user.email===email && user.passwordHash===btoa(password)){
+    localStorage.setItem("session",JSON.stringify({isLoggedIn:true,lastLogin:new Date().toISOString()}));
     showDashboard();
-  } else { alert("Credenciales incorrectas"); }
+  }else showToast("Credenciales incorrectas");
 }
 
-// ---- Dashboard ----
-function showDashboard() {
+// 🔹 Dashboard
+function showDashboard(){
   document.getElementById("registerSection").classList.add("hidden");
   document.getElementById("loginSection").classList.add("hidden");
   document.getElementById("dashboardSection").classList.remove("hidden");
   updateDashboard();
 }
+function showLogin(){document.getElementById("registerSection").classList.add("hidden");document.getElementById("loginSection").classList.remove("hidden");}
+function showRegister(){document.getElementById("loginSection").classList.add("hidden");document.getElementById("registerSection").classList.remove("hidden");}
 
-function showLogin() { document.getElementById("registerSection").classList.add("hidden"); document.getElementById("loginSection").classList.remove("hidden"); }
-function showRegister() { document.getElementById("loginSection").classList.add("hidden"); document.getElementById("registerSection").classList.remove("hidden"); }
-
-function updateDashboard() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  document.getElementById("balanceDisplay").innerText = `Saldo: ${user.wallet.balance.toFixed(4)} ${user.wallet.currency}`;
-  const totalUSD = (user.wallet.balance / rates[user.wallet.currency]).toFixed(2);
-  document.getElementById("totalUSD").innerText = `Total en USD: ${totalUSD}`;
-  updateHistory();
+function updateDashboard(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  document.getElementById("balanceDisplay").innerText=`Saldo: ${user.wallet.balance.toFixed(4)} ${user.wallet.currency}`;
+  document.getElementById("totalUSD").innerText=`Total en USD: ${(user.wallet.balance/rates[user.wallet.currency]).toFixed(2)}`;
+  updateAssetList(); updateHistory();
 }
 
-// ---- Logout ----
-document.getElementById("btnLogout").onclick = function() {
-  localStorage.removeItem("session");
-  showLogin();
+// 🔹 Asset List
+function updateAssetList(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  const list=document.getElementById("assetList"); list.innerHTML="";
+  const c=user.wallet.currency;
+  list.innerHTML=`<div class="asset-item"><div class="asset-name"><img src="${assetsInfo[c].logo}"/> ${c}</div><div>${user.wallet.balance.toFixed(4)} ${c} (~$${(user.wallet.balance/rates[c]).toFixed(2)})</div></div>`;
 }
 
-// ---- Historial ----
-function updateHistory() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const historyDiv = document.getElementById("historyLog");
-  historyDiv.innerHTML = "";
-  user.history.forEach(entry => { historyDiv.innerHTML += `<div>${entry}</div>`; });
+// 🔹 Historial
+function updateHistory(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  const historyDiv=document.getElementById("historyLog"); historyDiv.innerHTML="";
+  user.history.slice().reverse().forEach(entry=>{
+    historyDiv.innerHTML+=`<div class="entry"><img src="https://img.icons8.com/ios-filled/50/ffffff/transaction-list.png"/> ${entry}</div>`;
+  });
 }
 
-// ---- Agregar Fondos ----
-document.getElementById("btnSendFunds").onclick = function() {
-  alert("Simulación: Se enviaron los fondos. Ingresa el código de validación.");
+// 🔹 Modales
+const modalBg=document.getElementById("modalBg");
+const modalBody=document.getElementById("modalBody");
+document.getElementById("modalClose").onclick=()=>{ modalBg.style.display='none'; }
+
+// 🔹 Botones de acción (Recibir / Enviar / Comprar)
+document.getElementById("btnReceive").onclick=()=>{
+  modalBody.innerHTML=`<h3>Recibir ${JSON.parse(localStorage.getItem("user")).wallet.currency}</h3>
+  <p>Dirección: <strong>0x1234abcd...</strong></p>`;
+  modalBg.style.display='flex';
+}
+document.getElementById("btnSend").onclick=()=>{
+  modalBody.innerHTML=`<h3>Enviar ${JSON.parse(localStorage.getItem("user")).wallet.currency}</h3>
+  <input id="sendAddress" placeholder="Dirección destino"/>
+  <input id="sendAmount" placeholder="Monto"/>
+  <button id="btnConfirmSend">Confirmar envío</button>`;
+  modalBg.style.display='flex';
+  document.getElementById("btnConfirmSend").onclick=()=>{
+    const user=JSON.parse(localStorage.getItem("user"));
+    const addr=document.getElementById("sendAddress").value;
+    const amt=parseFloat(document.getElementById("sendAmount").value);
+    if(amt>user.wallet.balance){ showToast("Saldo insuficiente"); return; }
+    user.wallet.balance-=amt;
+    user.history.push(`${new Date().toLocaleString()} - Enviado: -${amt} ${user.wallet.currency} → ${addr}`);
+    localStorage.setItem("user",JSON.stringify(user));
+    updateDashboard(); showToast("Envío simulado"); modalBg.style.display='none';
+  }
+}
+document.getElementById("btnBuy").onclick=()=>{
+  modalBody.innerHTML=`<h3>Comprar ${JSON.parse(localStorage.getItem("user")).wallet.currency}</h3>
+  <input id="buyAmount" placeholder="Monto a comprar"/>
+  <button id="btnConfirmBuy">Comprar</button>`;
+  modalBg.style.display='flex';
+  document.getElementById("btnConfirmBuy").onclick=()=>{
+    const amt=parseFloat(document.getElementById("buyAmount").value);
+    const user=JSON.parse(localStorage.getItem("user"));
+    user.wallet.balance+=amt;
+    user.history.push(`${new Date().toLocaleString()} - Compra: +${amt} ${user.wallet.currency}`);
+    localStorage.setItem("user",JSON.stringify(user));
+    updateDashboard(); showToast("Compra simulada"); modalBg.style.display='none';
+  }
 }
 
-document.getElementById("btnValidateFund").onclick = function() {
-  const code = document.getElementById("fundCode").value;
-  if(code === "1234") { 
-    const user = JSON.parse(localStorage.getItem("user"));
-    user.wallet.balance += 20 * rates[user.wallet.currency];
-    user.history.push(`Bono de depósito validado: +${20 * rates[user.wallet.currency]} ${user.wallet.currency}`);
-    localStorage.setItem("user", JSON.stringify(user));
-    alert("Código validado. Fondos agregados a tu wallet.");
-    updateDashboard();
-  } else { alert("Código incorrecto."); }
-}
-
-// ---- Invertir ----
-document.getElementById("btnCalculateProfit").onclick = function() {
-  const amount = parseFloat(document.getElementById("investAmount").value);
-  const currency = document.getElementById("investCurrency").value;
-  const ratesSimulated = { USDT:0.3, USDC:0.08, BTC:0.12, SOL:0.10 }; 
-  const profit = amount * ratesSimulated[currency];
-  document.getElementById("profitDisplay").innerText = `Ganancia estimada: ${profit.toFixed(4)} ${currency}`;
-}
-
-document.getElementById("btnConfirmInvestment").onclick = function() {
-  const amount = parseFloat(document.getElementById("investAmount").value);
-  const currency = document.getElementById("investCurrency").value;
-  const user = JSON.parse(localStorage.getItem("user"));
-  if(amount > user.wallet.balance) { alert("Saldo insuficiente"); return; }
-  const ratesSimulated = { USDT:0.3, USDC:0.08, BTC:0.12, SOL:0.10 };
-  const profit = amount * ratesSimulated[currency];
-  user.wallet.balance -= amount;
-  user.history.push(`Inversión: -${amount} ${currency}, Ganancia estimada: ${profit.toFixed(4)} ${currency}`);
-  localStorage.setItem("user", JSON.stringify(user));
-  alert("Inversión registrada.");
-  updateDashboard();
-}
-
-// ---- Retirar fondos ----
-document.getElementById("btnWithdraw").onclick = function() {
-  const currency = document.getElementById("withdrawCurrency").value;
-  const address = document.getElementById("withdrawAddress").value;
-  const amount = parseFloat(document.getElementById("withdrawAmount").value);
-  const user = JSON.parse(localStorage.getItem("user"));
-  if(amount > user.wallet.balance) { alert("Saldo insuficiente"); return; }
-  user.wallet.balance -= amount;
-  user.history.push(`Retiro: -${amount} ${currency} a ${address}`);
-  localStorage.setItem("user", JSON.stringify(user));
-  alert(`Retiro simulado: ${amount} ${currency} enviado a ${address}`);
-  updateDashboard();
-}
-
-// ---- Convertir cripto ----
-document.getElementById("btnConvert").onclick = function() {
-  const from = document.getElementById("convertFrom").value;
-  const to = document.getElementById("convertTo").value;
-  const amount = parseFloat(document.getElementById("convertAmount").value);
-  const user = JSON.parse(localStorage.getItem("user"));
-  if(amount > user.wallet.balance || user.wallet.currency !== from) { alert("Saldo insuficiente o cripto incorrecta"); return; }
-  const converted = amount * rates[to] / rates[from];
-  user.wallet.balance -= amount;
-  user.wallet.balance += converted;
-  user.wallet.currency = to;
-  user.history.push(`Conversión: ${amount} ${from} → ${converted.toFixed(4)} ${to}`);
-  localStorage.setItem("user", JSON.stringify(user));
-  document.getElementById("convertResult").innerText = `Convertido: ${converted.toFixed(4)} ${to}`;
-  updateDashboard();
-}
-
-// ---- Auto check si ya hay sesión ----
-window.onload = function() {
-  const session = JSON.parse(localStorage.getItem("session"));
-  if(session && session.isLoggedIn) showDashboard();
+// 🔹 Auto check sesión
+window.onload=function(){
+  const session=JSON.parse(localStorage.getItem("session"));
+  if(session&&session.isLoggedIn) showDashboard();
   else if(localStorage.getItem("user")) showLogin();
   else showRegister();
 }
 </script>
+
 </body>
   </html>
