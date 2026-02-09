@@ -2,274 +2,209 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<title>WCripto Wallet</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trust Wallet Simulado</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* === Estilos Globales === */
-body { margin:0; padding:0; font-family:'Roboto',sans-serif; background:linear-gradient(180deg,#1b1d36,#2d3a5b); color:#fff; overflow-x:hidden; }
-.hidden { display:none; }
-.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#00cc88; padding:14px 20px; border-radius:12px; font-weight:700; display:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);}
-.container { max-width:480px; margin:20px auto; padding:20px; border-radius:16px; background:rgba(0,0,0,0.35); box-shadow:0 0 20px rgba(0,0,0,0.5);}
-h2 { text-align:center; font-weight:700; margin-bottom:20px; }
-h3 { margin:15px 0; font-weight:500; color:#a0d9ff; }
-input, select, button { width:100%; padding:12px; margin:6px 0; border-radius:12px; border:none; font-size:1em; }
-input, select { background:#2a2c40; color:#fff; }
-button { background:linear-gradient(90deg,#00cc88,#00ffaa); color:#fff; font-weight:700; cursor:pointer; transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.3);}
-button:hover { transform:scale(1.03); }
-.section { margin-top:25px; border-top:1px solid #444; padding-top:15px; }
-.balance { text-align:center; font-size:1.5em; font-weight:700; color:#00ffcc; margin-bottom:10px; }
-.info { font-size:0.9em; color:#ccc; margin:5px 0; }
-.btn-small { width:48%; display:inline-block; margin:2px 1%; font-size:0.9em; border-radius:12px; }
-.history { max-height:180px; overflow-y:auto; }
-.history .entry { background:#2f334b; padding:8px 12px; border-radius:12px; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
-.history .entry img { width:20px; height:20px; }
-.asset-list { margin-top:15px; }
-.asset-item { display:flex; align-items:center; justify-content:space-between; background:#2a2c40; padding:12px; border-radius:12px; margin-bottom:8px; }
-.asset-item img { width:32px; height:32px; margin-right:10px; }
-.asset-name { display:flex; align-items:center; font-weight:500; }
-.modal-bg { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:1000; }
-.modal { background:#1e1f33; padding:20px; border-radius:16px; width:90%; max-width:400px; position:relative;}
-.modal h3 { margin-top:0; }
-.modal button { margin-top:10px; }
-.modal .close { position:absolute; top:10px; right:14px; cursor:pointer; font-weight:700; color:#fff; }
-.balance-chart { margin-top:15px; }
-.action-buttons { display:flex; justify-content:space-between; margin-top:15px; }
-.action-buttons button { width:30%; border-radius:50%; padding:14px 0; font-size:0.8em; text-align:center; }
-.action-buttons button img { width:24px; height:24px; display:block; margin:0 auto 4px; }
+body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
+.container{max-width:420px;margin:auto;padding:15px}
+.card{background:#131a2a;border-radius:12px;padding:15px;margin-bottom:15px}
+button{width:100%;padding:12px;border:none;border-radius:8px;background:#1f80ff;color:#fff;font-size:16px;margin-top:8px;cursor:pointer}
+input,select{width:100%;padding:10px;border-radius:6px;border:none;margin-top:8px}
+.hidden{display:none}
+.small{font-size:12px;color:#aaa}
+.row{display:flex;justify-content:space-between;align-items:center}
+hr{border:0;border-top:1px solid #222}
 </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
+<div class="container">
 
-<!-- === Registro === -->
-<div class="container" id="registerSection">
-  <h2>Registro Wallet</h2>
-  <input type="email" id="regEmail" placeholder="Correo electrónico">
-  <input type="password" id="regPassword" placeholder="Contraseña">
-  <select id="regCurrency">
-    <option value="USDT">USDT</option>
-    <option value="USDC">USDC</option>
-    <option value="BTC">BTC</option>
-    <option value="SOL">SOL</option>
-  </select>
-  <input type="text" id="regCode" placeholder="Código de bono (opcional)">
-  <button id="btnRegister">Registrarse</button>
-  <p>¿Ya tienes cuenta? <button id="btnGoLogin" style="background:#007bff;">Iniciar Sesión</button></p>
+<!-- LOGIN / REGISTRO -->
+<div id="auth" class="card">
+<h2>WCripto Wallet</h2>
+<input id="email" placeholder="Correo">
+<input id="password" type="password" placeholder="Contraseña">
+<input id="bonus" placeholder="Código bono (opcional)">
+<button onclick="register()">Registrarse</button>
+<button onclick="login()">Entrar</button>
+<p class="small">Bono válido: BONO20 (solo una vez)</p>
 </div>
 
-<!-- === Login === -->
-<div class="container hidden" id="loginSection">
-  <h2>Login Wallet</h2>
-  <input type="email" id="loginEmail" placeholder="Correo electrónico">
-  <input type="password" id="loginPassword" placeholder="Contraseña">
-  <button id="btnLogin">Iniciar Sesión</button>
-  <p>¿No tienes cuenta? <button id="btnGoRegister" style="background:#007bff;">Registrarse</button></p>
+<!-- WALLET -->
+<div id="wallet" class="hidden">
+
+<div class="card">
+<h3>Balance total</h3>
+<h1 id="total">$0.00</h1>
 </div>
 
-<!-- === Dashboard === -->
-<div class="container hidden" id="dashboardSection">
-  <h2>Dashboard Wallet</h2>
-  <div class="balance" id="balanceDisplay">Saldo: 0</div>
-  <div class="info" id="totalUSD">Total en USD: 0</div>
-
-  <!-- Botones Trust Wallet -->
-  <div class="action-buttons">
-    <button id="btnReceive"><img src="https://img.icons8.com/ios-filled/50/00cc88/receive-cash.png"/>Recibir</button>
-    <button id="btnSend"><img src="https://img.icons8.com/ios-filled/50/00cc88/forward-arrow.png"/>Enviar</button>
-    <button id="btnBuy"><img src="https://img.icons8.com/ios-filled/50/00cc88/buy.png"/>Comprar</button>
-    <button id="btnSell"><img src="https://img.icons8.com/ios-filled/50/00cc88/sell.png"/>Vender</button>
-    <button id="btnSwap"><img src="https://img.icons8.com/ios-filled/50/00cc88/swap.png"/>Swap</button>
-    <button id="btnInvest"><img src="https://img.icons8.com/ios-filled/50/00cc88/investment.png"/>Invertir</button>
-  </div>
-
-  <!-- Lista de activos -->
-  <div class="asset-list" id="assetList"></div>
-
-  <!-- Conversión -->
-  <div class="section">
-    <h3>Convertir Cripto</h3>
-    <select id="convertFrom"></select>
-    <input type="number" id="convertAmount" placeholder="Monto">
-    <select id="convertTo"></select>
-    <button id="btnConvert">Convertir</button>
-    <div class="info" id="convertResult"></div>
-  </div>
-
-  <!-- Historial -->
-  <div class="section">
-    <h3>Historial</h3>
-    <div class="history" id="historyLog"></div>
-  </div>
-
-  <div class="section">
-    <button id="btnLogout">Cerrar Sesión</button>
-  </div>
+<div class="card">
+<h3>Activos</h3>
+<div id="balances"></div>
 </div>
 
-<!-- === Modal === -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal" id="modalContent">
-    <span class="close" id="modalClose">×</span>
-    <div id="modalBody"></div>
-  </div>
+<div class="card">
+<button onclick="showDeposit()">Agregar fondos</button>
+<button onclick="showSwap()">Swap</button>
+<button onclick="showInvest()">Invertir (12 días +30%)</button>
+<button onclick="logout()">Cerrar sesión</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="card">
+<h3>Historial</h3>
+<div id="history"></div>
+</div>
+
+</div>
+
+<!-- MODALES -->
+<div id="modal" class="hidden card"></div>
+
+</div>
+
 <script>
-// 🔹 Variables
-const rates={USDT:1,USDC:1,BTC:0.00035,SOL:0.04};
-const assetsInfo={
-  USDT:{logo:'https://cryptologos.cc/logos/tether-usdt-logo.png?v=025'},
-  USDC:{logo:'https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=025'},
-  BTC:{logo:'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=025'},
-  SOL:{logo:'https://cryptologos.cc/logos/solana-sol-logo.png?v=025'}
-};
-const validBonusCode="BONO20";
-const bonusAmountUSDT=20;
-
-// 🔹 Toast
-function showToast(msg){const t=document.getElementById("toast"); t.innerText=msg; t.style.display="block"; setTimeout(()=>{t.style.display="none";},2500);}
-
-// 🔹 Registro/Login
-document.getElementById("btnRegister").onclick=function(){
-  const email=document.getElementById("regEmail").value;
-  const password=document.getElementById("regPassword").value;
-  const code=document.getElementById("regCode").value;
-  const currency=document.getElementById("regCurrency").value;
-  if(localStorage.getItem("user")){ showToast("Usuario ya registrado. Solo login."); return;}
-  let balance=0; if(code===validBonusCode){ balance=bonusAmountUSDT*rates[currency]; showToast(`Bono aplicado: ${balance} ${currency}`);}
-  const user={email,passwordHash:btoa(password),wallet:{currency,balance},history:[]};
-  localStorage.setItem("user",JSON.stringify(user));
-  showToast("Registro exitoso. Inicia sesión."); showLogin();
-}
-document.getElementById("btnGoLogin").onclick=()=>{showLogin();}
-document.getElementById("btnGoRegister").onclick=()=>{showRegister();}
-document.getElementById("btnLogin").onclick=function(){
-  const email=document.getElementById("loginEmail").value;
-  const password=document.getElementById("loginPassword").value;
-  const user=JSON.parse(localStorage.getItem("user"));
-  if(user && user.email===email && user.passwordHash===btoa(password)){
-    localStorage.setItem("session",JSON.stringify({isLoggedIn:true,lastLogin:new Date().toISOString()}));
-    showDashboard();
-  }else showToast("Credenciales incorrectas");
+/* ---------- DATA BASE ---------- */
+const rates = { USDT:1, USDC:1, BTC:43000, SOL:110 }
+const depositAddress = {
+ USDT:"TXYZ-USDT-DEMO-123",
+ USDC:"USDC-DEMO-456",
+ BTC:"bc1-demo-btc",
+ SOL:"SoL-demo-789"
 }
 
-// 🔹 Mostrar secciones
-function showDashboard(){document.getElementById("registerSection").classList.add("hidden"); document.getElementById("loginSection").classList.add("hidden"); document.getElementById("dashboardSection").classList.remove("hidden"); updateDashboard();}
-function showLogin(){document.getElementById("registerSection").classList.add("hidden"); document.getElementById("loginSection").classList.remove("hidden");}
-function showRegister(){document.getElementById("loginSection").classList.add("hidden"); document.getElementById("registerSection").classList.remove("hidden");}
+/* ---------- HELPERS ---------- */
+function save(u){localStorage.setItem("user",JSON.stringify(u))}
+function load(){return JSON.parse(localStorage.getItem("user"))}
+function logged(){return localStorage.getItem("logged")==="1"}
+function updateUI(){
+ const u=load()
+ let total=0,html=""
+ for(let c in u.balances){
+  const v=u.balances[c]
+  total+=v*rates[c]
+  html+=`<div class="row"><span>${c}</span><b>${v.toFixed(4)}</b></div>`
+ }
+ document.getElementById("balances").innerHTML=html
+ document.getElementById("total").innerText="$"+total.toFixed(2)
 
-// 🔹 Dashboard
-function updateDashboard(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  document.getElementById("balanceDisplay").innerText=`Saldo: ${user.wallet.balance.toFixed(4)} ${user.wallet.currency}`;
-  document.getElementById("totalUSD").innerText=`Total en USD: ${(user.wallet.balance/rates[user.wallet.currency]).toFixed(2)}`;
-  updateAssetList();
-  updateHistory();
-  updateConvertOptions();
+ let h=""
+ u.history.forEach(x=>{
+  h+=`<div class="small">${x}</div>`
+ })
+ document.getElementById("history").innerHTML=h||"Sin movimientos"
 }
 
-// 🔹 Lista de activos
-function updateAssetList(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  const list=document.getElementById("assetList"); list.innerHTML="";
-  const c=user.wallet.currency;
-  list.innerHTML=`<div class="asset-item"><div class="asset-name"><img src="${assetsInfo[c].logo}"/> ${c}</div><div>${user.wallet.balance.toFixed(4)} ${c} (~$${(user.wallet.balance/rates[c]).toFixed(2)})</div></div>`;
+/* ---------- AUTH ---------- */
+function register(){
+ if(load()) return alert("Ya existe un usuario")
+ const bonus=document.getElementById("bonus").value
+ let balances={USDT:0,USDC:0,BTC:0,SOL:0}
+ if(bonus==="BONO20"){
+  balances.USDT=20
+  localStorage.setItem("bonusUsed","1")
+ }
+ const user={
+  email:email.value,
+  pass:password.value,
+  balances,
+  investments:[],
+  history:[bonus==="BONO20"?"Bono 20 USDT aplicado":"Registro creado"]
+ }
+ save(user); localStorage.setItem("logged","1")
+ start()
+}
+function login(){
+ const u=load()
+ if(!u||u.pass!==password.value) return alert("Datos incorrectos")
+ localStorage.setItem("logged","1")
+ start()
+}
+function logout(){
+ localStorage.removeItem("logged")
+ location.reload()
 }
 
-// 🔹 Historial
-function updateHistory(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  const historyDiv=document.getElementById("historyLog"); historyDiv.innerHTML="";
-  user.history.slice().reverse().forEach(entry=>{
-    historyDiv.innerHTML+=`<div class="entry"><img src="https://img.icons8.com/ios-filled/50/ffffff/transaction-list.png"/> ${entry}</div>`;
-  });
+/* ---------- UI ---------- */
+function start(){
+ document.getElementById("auth").classList.add("hidden")
+ document.getElementById("wallet").classList.remove("hidden")
+ updateUI()
 }
 
-// 🔹 Modales
-const modalBg=document.getElementById("modalBg");
-const modalBody=document.getElementById("modalBody");
-document.getElementById("modalClose").onclick=()=>{ modalBg.style.display='none'; }
-
-// 🔹 Botones principales
-document.getElementById("btnReceive").onclick=()=>{
-  const user=JSON.parse(localStorage.getItem("user"));
-  modalBody.innerHTML=`<h3>Recibir ${user.wallet.currency}</h3><p>Dirección: <strong>0x1234abcd...</strong></p>`;
-  modalBg.style.display='flex';
+/* ---------- DEPOSIT ---------- */
+function showDeposit(){
+ modal.innerHTML=`
+ <h3>Agregar fondos</h3>
+ <select id="coin">
+  <option>USDT</option><option>USDC</option>
+  <option>BTC</option><option>SOL</option>
+ </select>
+ <input id="amount" placeholder="Monto">
+ <p id="addr" class="small"></p>
+ <input id="code" placeholder="Código WhatsApp">
+ <button onclick="confirmDeposit()">Confirmar</button>
+ <button onclick="closeModal()">Cancelar</button>
+ `
+ modal.classList.remove("hidden")
+ coin.onchange=()=>addr.innerText="Enviar a: "+depositAddress[coin.value]
+ coin.onchange()
 }
-document.getElementById("btnSend").onclick=()=>{
-  const user=JSON.parse(localStorage.getItem("user"));
-  modalBody.innerHTML=`<h3>Enviar ${user.wallet.currency}</h3><input id="sendAddress" placeholder="Dirección destino"/><input id="sendAmount" type="number" placeholder="Monto"/><button id="btnConfirmSend">Confirmar envío</button>`;
-  modalBg.style.display='flex';
-  document.getElementById("btnConfirmSend").onclick=()=>{
-    const addr=document.getElementById("sendAddress").value;
-    const amt=parseFloat(document.getElementById("sendAmount").value);
-    if(amt>user.wallet.balance){ showToast("Saldo insuficiente"); return; }
-    user.wallet.balance-=amt;
-    user.history.push(`${new Date().toLocaleString()} - Enviado: -${amt} ${user.wallet.currency} → ${addr}`);
-    localStorage.setItem("user",JSON.stringify(user));
-    updateDashboard(); showToast("Envío simulado"); modalBg.style.display='none';
-  }
-}
-
-// 🔹 Compra/Venta
-document.getElementById("btnBuy").onclick=()=>{ showModalTrade("Comprar"); }
-document.getElementById("btnSell").onclick=()=>{ showModalTrade("Vender"); }
-function showModalTrade(type){
-  const user=JSON.parse(localStorage.getItem("user"));
-  modalBody.innerHTML=`<h3>${type} ${user.wallet.currency}</h3><input id="tradeAmount" type="number" placeholder="Monto"/><button id="btnConfirmTrade">${type}</button>`;
-  modalBg.style.display='flex';
-  document.getElementById("btnConfirmTrade").onclick=()=>{
-    const amt=parseFloat(document.getElementById("tradeAmount").value);
-    if(type==="Vender" && amt>user.wallet.balance){ showToast("Saldo insuficiente"); return; }
-    if(type==="Comprar"){ user.wallet.balance+=amt; user.history.push(`${new Date().toLocaleString()} - Compra: +${amt} ${user.wallet.currency}`); }
-    else { user.wallet.balance-=amt; user.history.push(`${new Date().toLocaleString()} - Venta: -${amt} ${user.wallet.currency}`); }
-    localStorage.setItem("user",JSON.stringify(user));
-    updateDashboard(); showToast(`${type} simulada`); modalBg.style.display='none';
-  }
+function confirmDeposit(){
+ if(code.value!=="123456") return alert("Código incorrecto")
+ const u=load()
+ u.balances[coin.value]+=Number(amount.value)
+ u.history.push(`Depósito ${amount.value} ${coin.value}`)
+ save(u); closeModal(); updateUI()
 }
 
-// 🔹 Swap
-document.getElementById("btnSwap").onclick=()=>{ showModalSwap(); }
-function showModalSwap(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  modalBody.innerHTML=`<h3>Swap Cripto</h3><select id="swapFrom"></select><input id="swapAmount" type="number" placeholder="Monto"/><select id="swapTo"></select><button id="btnConfirmSwap">Swap</button>`;
-  modalBg.style.display='flex';
-  updateSwapOptions();
-  document.getElementById("btnConfirmSwap").onclick=()=>{
-    const from=document.getElementById("swapFrom").value;
-    const to=document.getElementById("swapTo").value;
-    const amt=parseFloat(document.getElementById("swapAmount").value);
-    if(amt>user.wallet.balance || user.wallet.currency!==from){ showToast("Saldo insuficiente"); return; }
-    const converted=amt*rates[to]/rates[from];
-    user.wallet.balance-=amt;
-    user.wallet.balance+=converted;
-    user.wallet.currency=to;
-    user.history.push(`${new Date().toLocaleString()} - Swap: ${amt} ${from} → ${converted.toFixed(4)} ${to}`);
-    localStorage.setItem("user",JSON.stringify(user));
-    updateDashboard(); showToast("Swap realizado"); modalBg.style.display='none';
-  }
+/* ---------- SWAP ---------- */
+function showSwap(){
+ modal.innerHTML=`
+ <h3>Swap</h3>
+ <select id="from"><option>USDT</option><option>USDC</option><option>BTC</option><option>SOL</option></select>
+ <select id="to"><option>USDT</option><option>USDC</option><option>BTC</option><option>SOL</option></select>
+ <input id="amt" placeholder="Monto">
+ <button onclick="doSwap()">Swap</button>
+ <button onclick="closeModal()">Cancelar</button>`
+ modal.classList.remove("hidden")
+}
+function doSwap(){
+ const u=load()
+ if(u.balances[from.value]<amt.value) return alert("Saldo insuficiente")
+ const usd=amt.value*rates[from.value]
+ const recv=usd/rates[to.value]
+ u.balances[from.value]-=amt.value
+ u.balances[to.value]+=recv
+ u.history.push(`Swap ${amt.value} ${from.value} → ${recv.toFixed(4)} ${to.value}`)
+ save(u); closeModal(); updateUI()
 }
 
-// 🔹 Invertir
-document.getElementById("btnInvest").onclick=()=>{ showModalInvest(); }
-function showModalInvest(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  modalBody.innerHTML=`<h3>Invertir ${user.wallet.currency}</h3><input id="investAmount" type="number" placeholder="Monto"/><button id="btnConfirmInvest">Invertir</button>`;
-  modalBg.style.display='flex';
-  document.getElementById("btnConfirmInvest").onclick=()=>{
-    const amt=parseFloat(document.getElementById("investAmount").value);
-    if(amt>user.wallet.balance){ showToast("Saldo insuficiente"); return; }
-    user.wallet.balance-=amt;
-    user.history.push(`${new Date().toLocaleString()} - Inversión: -${amt} ${user.wallet.currency}`);
-    localStorage.setItem("user",JSON.stringify(user));
-    updateDashboard(); showToast("Inversión simulada"); modalBg.style.display='none';
-  }
+/* ---------- INVEST ---------- */
+function showInvest(){
+ modal.innerHTML=`
+ <h3>Invertir</h3>
+ <p class="small">12 días | +30%</p>
+ <input id="inv" placeholder="Monto USDT">
+ <button onclick="doInvest()">Invertir</button>
+ <button onclick="closeModal()">Cancelar</button>`
+ modal.classList.remove("hidden")
+}
+function doInvest(){
+ const u=load()
+ if(u.balances.USDT<inv.value||inv.value<5) return alert("Mínimo 5 USDT")
+ u.balances.USDT-=inv.value
+ const end=Date.now()+12*24*60*60*1000
+ u.investments.push({amount:Number(inv.value),end})
+ u.history.push(`Inversión ${inv.value} USDT`)
+ save(u); closeModal(); updateUI()
 }
 
-// 🔹 Conversión
-function updateConvertOptions(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  const cf=document.getElementById("convertFrom"); const ct=document.get
+/* ---------- MODAL ---------- */
+function closeModal(){modal.classList.add("hidden")}
+
+/* ---------- INIT ---------- */
+if(logged()) start()
+</script>
+</body>
+</html>
