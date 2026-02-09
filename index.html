@@ -6,37 +6,27 @@
 <title>WCripto Wallet</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ===== RESET & BODY ===== */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Roboto',sans-serif;background:#0f1226;color:#fff;line-height:1.5}
 .hidden{display:none}
-/* ===== CONTAINERS ===== */
 .container{max-width:420px;margin:20px auto;padding:20px;border-radius:18px;background:rgba(0,0,0,.35);box-shadow:0 20px 40px rgba(0,0,0,.5)}
 h2,h3{text-align:center;margin-bottom:12px}
 input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:14px;border:none;font-size:15px}
 button{cursor:pointer;font-weight:700;transition:.2s}
 button:hover{opacity:.9}
 input,select{background:#2a2f55;color:#fff}
-/* ===== BALANCE & INFO ===== */
 .balance{font-size:26px;font-weight:700;color:#00ffcc;text-align:center;margin-bottom:6px}
 .info{text-align:center;color:#ccc;margin-bottom:10px}
-/* ===== ACTION BUTTONS ===== */
 .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}
 .actions button{border-radius:50%;padding:18px 0;font-size:12px}
-/* ===== ASSETS ===== */
 .asset{background:#242852;padding:12px;border-radius:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-/* ===== HISTORY ===== */
 .history{max-height:160px;overflow:auto}
 .history div{background:#2b3166;padding:8px;border-radius:10px;margin-bottom:6px;font-size:13px}
-/* ===== TOAST ===== */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#00d2a8;padding:14px 22px;border-radius:14px;display:none;font-weight:700;z-index:999}
-/* ===== MODAL ===== */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:998}
 .modal{background:#1b1f3a;padding:20px;border-radius:18px;width:90%;max-width:360px;position:relative}
 .close{position:absolute;top:10px;right:14px;font-weight:700;cursor:pointer}
-/* ===== DARK MODE ===== */
 body.dark{background:#0a0c1a;color:#fff}
-/* ===== RESPONSIVE ===== */
 @media(max-width:480px){.container{margin:10px;padding:15px}}
 </style>
 </head>
@@ -44,18 +34,16 @@ body.dark{background:#0a0c1a;color:#fff}
 
 <div class="toast" id="toast"></div>
 
-<!-- REGISTRO / LOGIN -->
 <div class="container" id="auth">
 <h2>WCripto Wallet</h2>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Contraseña">
+<input id="email" placeholder="Email" required>
+<input id="password" type="password" placeholder="Contraseña" required>
 <input id="bonus" placeholder="Código bono (opcional)">
 <button id="registerBtn">Registrarse</button>
 <button id="loginBtn">Iniciar sesión</button>
 <p style="text-align:center;color:#aaa;font-size:12px;">Bono único: BONO20</p>
 </div>
 
-<!-- DASHBOARD -->
 <div class="container hidden" id="dash">
 <h2>Mi Wallet</h2>
 <div class="balance" id="balance"></div>
@@ -85,7 +73,6 @@ body.dark{background:#0a0c1a;color:#fff}
 <button onclick="logout()" style="background:#aa3333">Cerrar sesión</button>
 </div>
 
-<!-- MODAL -->
 <div class="modal-bg" id="modalBg">
 <div class="modal">
 <div class="close" onclick="closeModal()">✕</div>
@@ -94,68 +81,178 @@ body.dark{background:#0a0c1a;color:#fff}
 </div>
 
 <script>
-/* ===== VARIABLES Y TASAS ===== */
+/* ===== VARIABLES ===== */
 const rates={USDT:1,USDC:1,BTC:0.000035,SOL:0.04};
 const BONUS="BONO20",BONUS_AMT=20;
+const MAX_HISTORY = 100; // limitar historial para no crecer infinito
 
 /* ===== TOAST ===== */
-function toast(msg){const x=document.getElementById("toast");x.innerText=msg;x.style.display="block";setTimeout(()=>x.style.display="none",2200)}
+function toast(msg){
+  const x=document.getElementById("toast");
+  x.innerText=msg;
+  x.style.display="block";
+  setTimeout(()=>x.style.display="none",2200);
+}
 
-/* ===== LOCAL STORAGE ===== */
-function save(u){localStorage.setItem("user",JSON.stringify(u))}
-function load(){return JSON.parse(localStorage.getItem("user"))}
-function sessionActive(){return localStorage.getItem("session")=="1"}
+/* ===== STORAGE MULTIUSUARIO ===== */
+function saveUser(u){
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
+  const idx = users.findIndex(x=>x.email===u.email);
+  if(idx>=0) users[idx] = u; else users.push(u);
+  localStorage.setItem("users",JSON.stringify(users));
+}
+function loadUser(email){
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
+  return users.find(u=>u.email===email);
+}
+function sessionActive(){return localStorage.getItem("session")==="1"}
+function currentUserEmail(){return localStorage.getItem("currentUser")}
 
-/* ===== REGISTRO Y LOGIN ===== */
-document.getElementById("registerBtn").onclick=function(){
-const u=load();if(u){toast("Usuario ya existe");return;}
-let bal={USDT:0,USDC:0,BTC:0,SOL:0};
-if(document.getElementById("bonus").value===BONUS)bal.USDT=BONUS_AMT;
-const user={email:document.getElementById("email").value,pass:btoa(document.getElementById("password").value),cur:"USDT",bal,hist:[document.getElementById("bonus").value===BONUS?"Bono 20 USDT aplicado":"Registro creado"]};
-save(user);localStorage.setItem("session","1");start();toast("Registro exitoso")};
-
-document.getElementById("loginBtn").onclick=function(){
-const u=load();if(!u||u.pass!==btoa(document.getElementById("password").value)||u.email!==document.getElementById("email").value){toast("Datos incorrectos");return;}
-localStorage.setItem("session","1");start();toast("Bienvenido de nuevo")};
+/* ===== MODAL ===== */
+const modalBody = document.getElementById("modalBody");
+function modal(html){modalBody.innerHTML=html; document.getElementById("modalBg").style.display="flex"}
+function closeModal(){document.getElementById("modalBg").style.display="none"}
 
 /* ===== DASHBOARD ===== */
 function start(){
-document.getElementById("auth").classList.add("hidden");
-document.getElementById("dash").classList.remove("hidden");
-render();
+  const email = currentUserEmail();
+  if(!email || !loadUser(email)){logout(); return;} // previene error si usuario borrado
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("dash").classList.remove("hidden");
+  render();
 }
-function logout(){localStorage.removeItem("session");location.reload()}
+function logout(){localStorage.removeItem("session");localStorage.removeItem("currentUser");location.reload()}
 
 /* ===== RENDER ===== */
 function render(){
-const u=load();
-balance.innerText=`${u.bal[u.cur].toFixed(4)} ${u.cur}`;
-usd.innerText=`≈ $${(u.bal[u.cur]/rates[u.cur]).toFixed(2)}`;
-asset.innerText=`${u.cur} — ${u.bal[u.cur].toFixed(4)}`;
-history.innerHTML=u.hist.slice().reverse().map(h=>`<div>${h}</div>`).join("");
-cFrom.innerHTML=cTo.innerHTML="";
-Object.keys(rates).forEach(c=>{cFrom.innerHTML+=`<option>${c}</option>`;cTo.innerHTML+=`<option>${c}</option>`})}
+  const email = currentUserEmail();
+  if(!email) return;
+  const u = loadUser(email);
+  if(!u) return;
+  document.getElementById("balance").innerText = `${u.bal[u.cur].toFixed(4)} ${u.cur}`;
+  document.getElementById("usd").innerText = `≈ $${(u.bal[u.cur]/rates[u.cur]).toFixed(2)}`;
+  document.getElementById("asset").innerText = `${u.cur} — ${u.bal[u.cur].toFixed(4)}`;
+  const h=document.getElementById("history");
+  let histSlice = u.hist.slice(-MAX_HISTORY).reverse(); // limitar historial
+  h.innerHTML = histSlice.map(item => `<div>${item}</div>`).join("");
+  const cF=document.getElementById("cFrom"), cT=document.getElementById("cTo");
+  cF.innerHTML=""; cT.innerHTML="";
+  Object.keys(rates).forEach(c => { cF.innerHTML+=`<option>${c}</option>`; cT.innerHTML+=`<option>${c}</option>` });
+}
 
-/* ===== MODAL ===== */
-function modal(html){modalBody.innerHTML=html;modalBg.style.display="flex"}
-function closeModal(){modalBg.style.display="none"}
+/* ===== REGISTRO ===== */
+document.getElementById("registerBtn").onclick = function(){
+  const email=document.getElementById("email").value.trim();
+  const pass=document.getElementById("password").value.trim();
+  const bonusInput = document.getElementById("bonus").value.trim().toUpperCase();
+
+  // validar email con regex simple
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!email || !pass){toast("Completa email y contraseña"); return;}
+  if(!emailRegex.test(email)){toast("Email inválido"); return;}
+  if(loadUser(email)){toast("Usuario ya existe"); return;}
+
+  let bal={USDT:0,USDC:0,BTC:0,SOL:0};
+  const histMsg = (bonusInput===BONUS) ? `Bono 20 USDT aplicado` : "Registro creado";
+  if(bonusInput===BONUS) bal.USDT=BONUS_AMT;
+
+  const user={
+    email,
+    pass:btoa(pass),
+    cur:"USDT",
+    bal,
+    hist:[histMsg]
+  };
+  saveUser(user);
+  localStorage.setItem("session","1");
+  localStorage.setItem("currentUser", email);
+  start();
+  toast("Registro exitoso");
+}
+
+/* ===== LOGIN ===== */
+document.getElementById("loginBtn").onclick = function(){
+  const email=document.getElementById("email").value.trim();
+  const pass=document.getElementById("password").value.trim();
+  if(!email || !pass){toast("Completa email y contraseña"); return;}
+  const u = loadUser(email);
+  if(!u || u.pass!==btoa(pass)){toast("Datos incorrectos"); return;}
+  localStorage.setItem("session","1");
+  localStorage.setItem("currentUser", email);
+  start();
+  toast("Bienvenido de nuevo");
+}
+
+/* ===== CONVERSIÓN ===== */
+function convert(){
+  const amt=parseFloat(document.getElementById("cAmt").value);
+  const from=document.getElementById("cFrom").value;
+  const to=document.getElementById("cTo").value;
+  if(isNaN(amt)||amt<=0){toast("Monto inválido"); return;}
+  if(from===to){toast("Selecciona monedas diferentes"); return;}
+  let r = amt*rates[to]/rates[from];
+  // redondeo especial para monedas pequeñas
+  r = (to==="BTC" || to==="SOL") ? r.toFixed(6) : r.toFixed(2);
+  document.getElementById("cResult").innerText=`≈ ${r} ${to}`;
+}
 
 /* ===== FUNCIONES PRINCIPALES ===== */
 function modalReceive(){modal(`<h3>Recibir</h3><p>Dirección simulada:</p><b>0xABC123...</b>`)}
-function modalSend(){modal(`<h3>Enviar</h3><input id=sAmt type=number placeholder=Monto><button onclick=send()>Enviar</button>`)}
-function send(){const u=load();const a=parseFloat(sAmt.value);if(a>u.bal[u.cur]){toast("Saldo insuficiente");return;}u.bal[u.cur]-=a;u.hist.push(`Envío -${a} ${u.cur}`);save(u);closeModal();render()}
+function modalSend(){modal(`<h3>Enviar</h3><input id=sAmt type=number placeholder=Monto min="0" required><button onclick=send()>Enviar</button>`)}
+function send(){
+  const email = currentUserEmail();
+  const u = loadUser(email);
+  const amt=parseFloat(document.getElementById("sAmt").value);
+  if(isNaN(amt)||amt<=0||amt>u.bal[u.cur]){toast("Saldo insuficiente"); return;}
+  u.bal[u.cur]-=amt;
+  u.hist.push(`Envío -${amt} ${u.cur}`);
+  saveUser(u); closeModal(); render();
+}
 function modalBuy(){trade("Compra","+")}
 function modalSell(){trade("Venta","-")}
-function trade(t,s){modal(`<h3>${t}</h3><input id=tAmt type=number><button onclick=doTrade("${s}")>${t}</button>`)}
-function doTrade(s){const u=load();const a=parseFloat(tAmt.value);if(s==="-"&&a>u.bal[u.cur]){toast("Saldo insuficiente");return;}u.bal[u.cur]+=s==="+"?a:-a;u.hist.push(`${s==="+"?"Compra":"Venta"} ${a} ${u.cur}`);save(u);closeModal();render()}
-function modalSwap(){modal(`<h3>Swap</h3><select id=sf></select><input id=sa type=number><select id=st></select><button onclick=swap()>Swap</button>`);Object.keys(rates).forEach(c=>{sf.innerHTML+=`<option>${c}</option>`;st.innerHTML+=`<option>${c}</option>`})}
-function swap(){const u=load();const a=parseFloat(sa.value);if(a>u.bal[sf.value]){toast("Saldo insuficiente");return;}const res=a*rates[st.value]/rates[sf.value];u.bal[sf.value]-=a;u.bal[st.value]+=res;u.hist.push(`Swap ${a} ${sf.value} → ${res.toFixed(4)} ${st.value}`);save(u);closeModal();render()}
-function modalInvest(){modal(`<h3>Invertir</h3><input id=iAmt type=number placeholder="Monto"><button onclick=invest()>Invertir</button>`)}
-function invest(){const u=load();const a=parseFloat(iAmt.value);if(a>u.bal[u.cur]){toast("Saldo insuficiente");return;}u.bal[u.cur]-=a;u.hist.push(`Inversión ${a} ${u.cur}`);save(u);closeModal();render()}
-function convert(){const r=cAmt.value*rates[cTo.value]/rates[cFrom.value];cResult.innerText=`≈ ${r.toFixed(6)} ${cTo.value}`}
+function trade(t,s){modal(`<h3>${t}</h3><input id=tAmt type=number placeholder="Monto" min="0" required><button onclick=doTrade("${s}")>${t}</button>`)}
+function doTrade(s){
+  const email = currentUserEmail();
+  const u = loadUser(email);
+  const amt=parseFloat(document.getElementById("tAmt").value);
+  if(isNaN(amt)||(s==="-"&&amt>u.bal[u.cur])||amt<=0){toast("Monto inválido"); return;}
+  u.bal[u.cur]+=s==="+"?amt:-amt;
+  u.hist.push(`${s==="+"?"Compra":"Venta"} ${amt} ${u.cur}`);
+  saveUser(u); closeModal(); render();
+}
+function modalSwap(){
+  modal(`<h3>Swap</h3><select id=sf></select><input id=sa type=number placeholder="Monto" min="0" required><select id=st></select><button onclick=swap()>Swap</button>`);
+  const sf=document.getElementById("sf"), st=document.getElementById("st");
+  Object.keys(rates).forEach(c=>{sf.innerHTML+=`<option>${c}</option>`; st.innerHTML+=`<option>${c}</option>`})
+}
+function swap(){
+  const email = currentUserEmail();
+  const u = loadUser(email);
+  const sf=document.getElementById("sf").value;
+  const st=document.getElementById("st").value;
+  const amt=parseFloat(document.getElementById("sa").value);
+  if(sf===st){toast("Selecciona monedas diferentes"); return;}
+  if(isNaN(amt)||amt<=0||amt>u.bal[sf]){toast("Saldo insuficiente"); return;}
+  let res = amt*rates[st]/rates[sf];
+  res = (st==="BTC" || st==="SOL") ? res.toFixed(6) : res.toFixed(4);
+  u.bal[sf]-=amt;
+  u.bal[st]=parseFloat((u.bal[st]+parseFloat(res)).toFixed(6));
+  u.hist.push(`Swap ${amt} ${sf} → ${res} ${st}`);
+  saveUser(u); closeModal(); render();
+}
+function modalInvest(){modal(`<h3>Invertir</h3><input id=iAmt type=number placeholder="Monto" min="0" required><button onclick=invest()>Invertir</button>`)}
+function invest(){
+  const email = currentUserEmail();
+  const u = loadUser(email);
+  const amt=parseFloat(document.getElementById("iAmt").value);
+  if(isNaN(amt)||amt<=0||amt>u.bal[u.cur]){toast("Saldo insuficiente"); return;}
+  u.bal[u.cur]-=amt;
+  u.hist.push(`Inversión ${amt} ${u.cur}`);
+  saveUser(u); closeModal(); render();
+}
 
-/* ===== INICIAR SESIÓN AUTOMÁTICO ===== */
-if(sessionActive())start();
+/* ===== INICIO AUTOMÁTICO ===== */
+if(sessionActive() && currentUserEmail()) start();
 </script>
 </body>
  </html>
