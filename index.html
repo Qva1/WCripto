@@ -3,34 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallet Crypto Tipo Trust Wallet</title>
+<title>Trust Wallet Simulado</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-body {
-  margin:0; padding:0; font-family: 'Roboto', sans-serif;
-  background: linear-gradient(180deg,#1b1d36,#2d3a5b);
-  color:#fff; overflow-x:hidden;
-}
+/* === Estilos Globales === */
+body { margin:0; padding:0; font-family:'Roboto',sans-serif; background:linear-gradient(180deg,#1b1d36,#2d3a5b); color:#fff; overflow-x:hidden; }
 .hidden { display:none; }
-.toast {
-  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-  background:#00cc88; padding:14px 20px; border-radius:12px;
-  font-weight:700; display:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);
-}
-.container {
-  max-width:480px; margin:20px auto; padding:20px; border-radius:16px;
-  background:rgba(0,0,0,0.35); box-shadow:0 0 20px rgba(0,0,0,0.5);
-}
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#00cc88; padding:14px 20px; border-radius:12px; font-weight:700; display:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+.container { max-width:480px; margin:20px auto; padding:20px; border-radius:16px; background:rgba(0,0,0,0.35); box-shadow:0 0 20px rgba(0,0,0,0.5);}
 h2 { text-align:center; font-weight:700; margin-bottom:20px; }
 h3 { margin:15px 0; font-weight:500; color:#a0d9ff; }
-input, select, button {
-  width:100%; padding:12px; margin:6px 0; border-radius:12px; border:none; font-size:1em;
-}
+input, select, button { width:100%; padding:12px; margin:6px 0; border-radius:12px; border:none; font-size:1em; }
 input, select { background:#2a2c40; color:#fff; }
-button {
-  background:linear-gradient(90deg,#00cc88,#00ffaa); color:#fff; font-weight:700; cursor:pointer;
-  transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.3);
-}
+button { background:linear-gradient(90deg,#00cc88,#00ffaa); color:#fff; font-weight:700; cursor:pointer; transition:0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.3);}
 button:hover { transform:scale(1.03); }
 .section { margin-top:25px; border-top:1px solid #444; padding-top:15px; }
 .balance { text-align:center; font-size:1.5em; font-weight:700; color:#00ffcc; margin-bottom:10px; }
@@ -43,11 +28,8 @@ button:hover { transform:scale(1.03); }
 .asset-item { display:flex; align-items:center; justify-content:space-between; background:#2a2c40; padding:12px; border-radius:12px; margin-bottom:8px; }
 .asset-item img { width:32px; height:32px; margin-right:10px; }
 .asset-name { display:flex; align-items:center; font-weight:500; }
-.modal-bg {
-  position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6);
-  display:none; justify-content:center; align-items:center; z-index:1000;
-}
-.modal { background:#1e1f33; padding:20px; border-radius:16px; width:90%; max-width:400px; }
+.modal-bg { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:1000; }
+.modal { background:#1e1f33; padding:20px; border-radius:16px; width:90%; max-width:400px; position:relative;}
 .modal h3 { margin-top:0; }
 .modal button { margin-top:10px; }
 .modal .close { position:absolute; top:10px; right:14px; cursor:pointer; font-weight:700; color:#fff; }
@@ -61,7 +43,7 @@ button:hover { transform:scale(1.03); }
 
 <div class="toast" id="toast"></div>
 
-<!-- Registro -->
+<!-- === Registro === -->
 <div class="container" id="registerSection">
   <h2>Registro Wallet</h2>
   <input type="email" id="regEmail" placeholder="Correo electrónico">
@@ -77,7 +59,7 @@ button:hover { transform:scale(1.03); }
   <p>¿Ya tienes cuenta? <button id="btnGoLogin" style="background:#007bff;">Iniciar Sesión</button></p>
 </div>
 
-<!-- Login -->
+<!-- === Login === -->
 <div class="container hidden" id="loginSection">
   <h2>Login Wallet</h2>
   <input type="email" id="loginEmail" placeholder="Correo electrónico">
@@ -86,30 +68,47 @@ button:hover { transform:scale(1.03); }
   <p>¿No tienes cuenta? <button id="btnGoRegister" style="background:#007bff;">Registrarse</button></p>
 </div>
 
-<!-- Dashboard -->
+<!-- === Dashboard === -->
 <div class="container hidden" id="dashboardSection">
   <h2>Dashboard Wallet</h2>
   <div class="balance" id="balanceDisplay">Saldo: 0</div>
   <div class="info" id="totalUSD">Total en USD: 0</div>
-  
-  <!-- Botones estilo Trust Wallet -->
+
+  <!-- Botones Trust Wallet -->
   <div class="action-buttons">
     <button id="btnReceive"><img src="https://img.icons8.com/ios-filled/50/00cc88/receive-cash.png"/>Recibir</button>
     <button id="btnSend"><img src="https://img.icons8.com/ios-filled/50/00cc88/forward-arrow.png"/>Enviar</button>
     <button id="btnBuy"><img src="https://img.icons8.com/ios-filled/50/00cc88/buy.png"/>Comprar</button>
+    <button id="btnSell"><img src="https://img.icons8.com/ios-filled/50/00cc88/sell.png"/>Vender</button>
+    <button id="btnSwap"><img src="https://img.icons8.com/ios-filled/50/00cc88/swap.png"/>Swap</button>
+    <button id="btnInvest"><img src="https://img.icons8.com/ios-filled/50/00cc88/investment.png"/>Invertir</button>
   </div>
 
   <!-- Lista de activos -->
   <div class="asset-list" id="assetList"></div>
+
+  <!-- Conversión -->
+  <div class="section">
+    <h3>Convertir Cripto</h3>
+    <select id="convertFrom"></select>
+    <input type="number" id="convertAmount" placeholder="Monto">
+    <select id="convertTo"></select>
+    <button id="btnConvert">Convertir</button>
+    <div class="info" id="convertResult"></div>
+  </div>
 
   <!-- Historial -->
   <div class="section">
     <h3>Historial</h3>
     <div class="history" id="historyLog"></div>
   </div>
+
+  <div class="section">
+    <button id="btnLogout">Cerrar Sesión</button>
+  </div>
 </div>
 
-<!-- Modales -->
+<!-- === Modal === -->
 <div class="modal-bg" id="modalBg">
   <div class="modal" id="modalContent">
     <span class="close" id="modalClose">×</span>
@@ -119,22 +118,19 @@ button:hover { transform:scale(1.03); }
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// 🔹 Variables y rates
-const rates = { USDT:1, USDC:1, BTC:0.00035, SOL:0.04 };
-const assetsInfo = {
+// 🔹 Variables
+const rates={USDT:1,USDC:1,BTC:0.00035,SOL:0.04};
+const assetsInfo={
   USDT:{logo:'https://cryptologos.cc/logos/tether-usdt-logo.png?v=025'},
   USDC:{logo:'https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=025'},
   BTC:{logo:'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=025'},
   SOL:{logo:'https://cryptologos.cc/logos/solana-sol-logo.png?v=025'}
 };
-const validBonusCode = "BONO20";
-const bonusAmountUSDT = 20;
+const validBonusCode="BONO20";
+const bonusAmountUSDT=20;
 
 // 🔹 Toast
-function showToast(msg){
-  const t=document.getElementById("toast"); t.innerText=msg; t.style.display="block";
-  setTimeout(()=>{t.style.display="none";},2500);
-}
+function showToast(msg){const t=document.getElementById("toast"); t.innerText=msg; t.style.display="block"; setTimeout(()=>{t.style.display="none";},2500);}
 
 // 🔹 Registro/Login
 document.getElementById("btnRegister").onclick=function(){
@@ -148,8 +144,8 @@ document.getElementById("btnRegister").onclick=function(){
   localStorage.setItem("user",JSON.stringify(user));
   showToast("Registro exitoso. Inicia sesión."); showLogin();
 }
-document.getElementById("btnGoLogin").onclick=showLogin;
-document.getElementById("btnGoRegister").onclick=showRegister;
+document.getElementById("btnGoLogin").onclick=()=>{showLogin();}
+document.getElementById("btnGoRegister").onclick=()=>{showRegister();}
 document.getElementById("btnLogin").onclick=function(){
   const email=document.getElementById("loginEmail").value;
   const password=document.getElementById("loginPassword").value;
@@ -160,24 +156,22 @@ document.getElementById("btnLogin").onclick=function(){
   }else showToast("Credenciales incorrectas");
 }
 
-// 🔹 Dashboard
-function showDashboard(){
-  document.getElementById("registerSection").classList.add("hidden");
-  document.getElementById("loginSection").classList.add("hidden");
-  document.getElementById("dashboardSection").classList.remove("hidden");
-  updateDashboard();
-}
-function showLogin(){document.getElementById("registerSection").classList.add("hidden");document.getElementById("loginSection").classList.remove("hidden");}
-function showRegister(){document.getElementById("loginSection").classList.add("hidden");document.getElementById("registerSection").classList.remove("hidden");}
+// 🔹 Mostrar secciones
+function showDashboard(){document.getElementById("registerSection").classList.add("hidden"); document.getElementById("loginSection").classList.add("hidden"); document.getElementById("dashboardSection").classList.remove("hidden"); updateDashboard();}
+function showLogin(){document.getElementById("registerSection").classList.add("hidden"); document.getElementById("loginSection").classList.remove("hidden");}
+function showRegister(){document.getElementById("loginSection").classList.add("hidden"); document.getElementById("registerSection").classList.remove("hidden");}
 
+// 🔹 Dashboard
 function updateDashboard(){
   const user=JSON.parse(localStorage.getItem("user"));
   document.getElementById("balanceDisplay").innerText=`Saldo: ${user.wallet.balance.toFixed(4)} ${user.wallet.currency}`;
   document.getElementById("totalUSD").innerText=`Total en USD: ${(user.wallet.balance/rates[user.wallet.currency]).toFixed(2)}`;
-  updateAssetList(); updateHistory();
+  updateAssetList();
+  updateHistory();
+  updateConvertOptions();
 }
 
-// 🔹 Asset List
+// 🔹 Lista de activos
 function updateAssetList(){
   const user=JSON.parse(localStorage.getItem("user"));
   const list=document.getElementById("assetList"); list.innerHTML="";
@@ -199,20 +193,17 @@ const modalBg=document.getElementById("modalBg");
 const modalBody=document.getElementById("modalBody");
 document.getElementById("modalClose").onclick=()=>{ modalBg.style.display='none'; }
 
-// 🔹 Botones de acción (Recibir / Enviar / Comprar)
+// 🔹 Botones principales
 document.getElementById("btnReceive").onclick=()=>{
-  modalBody.innerHTML=`<h3>Recibir ${JSON.parse(localStorage.getItem("user")).wallet.currency}</h3>
-  <p>Dirección: <strong>0x1234abcd...</strong></p>`;
+  const user=JSON.parse(localStorage.getItem("user"));
+  modalBody.innerHTML=`<h3>Recibir ${user.wallet.currency}</h3><p>Dirección: <strong>0x1234abcd...</strong></p>`;
   modalBg.style.display='flex';
 }
 document.getElementById("btnSend").onclick=()=>{
-  modalBody.innerHTML=`<h3>Enviar ${JSON.parse(localStorage.getItem("user")).wallet.currency}</h3>
-  <input id="sendAddress" placeholder="Dirección destino"/>
-  <input id="sendAmount" placeholder="Monto"/>
-  <button id="btnConfirmSend">Confirmar envío</button>`;
+  const user=JSON.parse(localStorage.getItem("user"));
+  modalBody.innerHTML=`<h3>Enviar ${user.wallet.currency}</h3><input id="sendAddress" placeholder="Dirección destino"/><input id="sendAmount" type="number" placeholder="Monto"/><button id="btnConfirmSend">Confirmar envío</button>`;
   modalBg.style.display='flex';
   document.getElementById("btnConfirmSend").onclick=()=>{
-    const user=JSON.parse(localStorage.getItem("user"));
     const addr=document.getElementById("sendAddress").value;
     const amt=parseFloat(document.getElementById("sendAmount").value);
     if(amt>user.wallet.balance){ showToast("Saldo insuficiente"); return; }
@@ -222,29 +213,63 @@ document.getElementById("btnSend").onclick=()=>{
     updateDashboard(); showToast("Envío simulado"); modalBg.style.display='none';
   }
 }
-document.getElementById("btnBuy").onclick=()=>{
-  modalBody.innerHTML=`<h3>Comprar ${JSON.parse(localStorage.getItem("user")).wallet.currency}</h3>
-  <input id="buyAmount" placeholder="Monto a comprar"/>
-  <button id="btnConfirmBuy">Comprar</button>`;
+
+// 🔹 Compra/Venta
+document.getElementById("btnBuy").onclick=()=>{ showModalTrade("Comprar"); }
+document.getElementById("btnSell").onclick=()=>{ showModalTrade("Vender"); }
+function showModalTrade(type){
+  const user=JSON.parse(localStorage.getItem("user"));
+  modalBody.innerHTML=`<h3>${type} ${user.wallet.currency}</h3><input id="tradeAmount" type="number" placeholder="Monto"/><button id="btnConfirmTrade">${type}</button>`;
   modalBg.style.display='flex';
-  document.getElementById("btnConfirmBuy").onclick=()=>{
-    const amt=parseFloat(document.getElementById("buyAmount").value);
-    const user=JSON.parse(localStorage.getItem("user"));
-    user.wallet.balance+=amt;
-    user.history.push(`${new Date().toLocaleString()} - Compra: +${amt} ${user.wallet.currency}`);
+  document.getElementById("btnConfirmTrade").onclick=()=>{
+    const amt=parseFloat(document.getElementById("tradeAmount").value);
+    if(type==="Vender" && amt>user.wallet.balance){ showToast("Saldo insuficiente"); return; }
+    if(type==="Comprar"){ user.wallet.balance+=amt; user.history.push(`${new Date().toLocaleString()} - Compra: +${amt} ${user.wallet.currency}`); }
+    else { user.wallet.balance-=amt; user.history.push(`${new Date().toLocaleString()} - Venta: -${amt} ${user.wallet.currency}`); }
     localStorage.setItem("user",JSON.stringify(user));
-    updateDashboard(); showToast("Compra simulada"); modalBg.style.display='none';
+    updateDashboard(); showToast(`${type} simulada`); modalBg.style.display='none';
   }
 }
 
-// 🔹 Auto check sesión
-window.onload=function(){
-  const session=JSON.parse(localStorage.getItem("session"));
-  if(session&&session.isLoggedIn) showDashboard();
-  else if(localStorage.getItem("user")) showLogin();
-  else showRegister();
+// 🔹 Swap
+document.getElementById("btnSwap").onclick=()=>{ showModalSwap(); }
+function showModalSwap(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  modalBody.innerHTML=`<h3>Swap Cripto</h3><select id="swapFrom"></select><input id="swapAmount" type="number" placeholder="Monto"/><select id="swapTo"></select><button id="btnConfirmSwap">Swap</button>`;
+  modalBg.style.display='flex';
+  updateSwapOptions();
+  document.getElementById("btnConfirmSwap").onclick=()=>{
+    const from=document.getElementById("swapFrom").value;
+    const to=document.getElementById("swapTo").value;
+    const amt=parseFloat(document.getElementById("swapAmount").value);
+    if(amt>user.wallet.balance || user.wallet.currency!==from){ showToast("Saldo insuficiente"); return; }
+    const converted=amt*rates[to]/rates[from];
+    user.wallet.balance-=amt;
+    user.wallet.balance+=converted;
+    user.wallet.currency=to;
+    user.history.push(`${new Date().toLocaleString()} - Swap: ${amt} ${from} → ${converted.toFixed(4)} ${to}`);
+    localStorage.setItem("user",JSON.stringify(user));
+    updateDashboard(); showToast("Swap realizado"); modalBg.style.display='none';
+  }
 }
-</script>
 
-</body>
-  </html>
+// 🔹 Invertir
+document.getElementById("btnInvest").onclick=()=>{ showModalInvest(); }
+function showModalInvest(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  modalBody.innerHTML=`<h3>Invertir ${user.wallet.currency}</h3><input id="investAmount" type="number" placeholder="Monto"/><button id="btnConfirmInvest">Invertir</button>`;
+  modalBg.style.display='flex';
+  document.getElementById("btnConfirmInvest").onclick=()=>{
+    const amt=parseFloat(document.getElementById("investAmount").value);
+    if(amt>user.wallet.balance){ showToast("Saldo insuficiente"); return; }
+    user.wallet.balance-=amt;
+    user.history.push(`${new Date().toLocaleString()} - Inversión: -${amt} ${user.wallet.currency}`);
+    localStorage.setItem("user",JSON.stringify(user));
+    updateDashboard(); showToast("Inversión simulada"); modalBg.style.display='none';
+  }
+}
+
+// 🔹 Conversión
+function updateConvertOptions(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  const cf=document.getElementById("convertFrom"); const ct=document.get
